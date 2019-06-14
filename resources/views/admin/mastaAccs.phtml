@@ -1,0 +1,35 @@
+<table class="table">
+  <thead class="thead-light">
+    <tr>
+      <?php 
+      if (sizeof($data["accsForMasta"])>1){
+      $tHeads= array("email","Zablokovaný","Master účet","","");
+       foreach ($tHeads as $tHead): ?>
+      <th scope="col"><?php echo $tHead ?></th>
+    <?php endforeach ?>
+    </tr>
+  </thead>
+  <tbody>
+    <?php 
+      $index=0;
+    foreach ($data["accsForMasta"] as $acc): 
+      if ($index==$_SESSION["accI"]) {
+        $index++;
+        continue;
+      }
+      ?>
+    <tr>
+      <th scope="row"><?php echo $acc->mail ?></th>
+      <td><?php echo $acc->locked ?></td>
+      <td><?php echo $acc->masta?></td>
+      <td><a href="" class="text-dark"><i class="far fa-edit"></i></a></td>
+      <td><form action="deleteAccount" class="m-0" method="POST">
+            <input type="hidden" name="accID[]" value="<?php echo $index ?>">
+            <button class="fs-16 btn btn-delete action" type="button" onclick="delCheck(this)"><i class="clr-red fas fa-times-circle"></i></button></form></td>
+    </tr>
+  <?php $index++; endforeach;
+  }else{ ?>
+    Nie sú tu žiadné učty.
+<?php } ?>
+  </tbody>
+</table>

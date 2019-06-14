@@ -1,0 +1,59 @@
+@media screen and (max-width: 992px) {
+  /* line 6, ../../resources/sass/query.sass */
+  .login main {
+    padding: 5.5rem 5rem 3rem 5rem !important;
+  }
+}
+@media screen and (max-width: 768px) {
+  /* line 10, ../../resources/sass/query.sass */
+  nav {
+    -webkit-box-shadow: 0px 1px 11px 6px #302f2f !important;
+            box-shadow: 0px 1px 11px 6px #302f2f !important;
+    height: -webkit-max-content !important;
+    height: -moz-max-content !important;
+    height: max-content !important;
+    position: relative !important;
+  }
+  /* line 14, ../../resources/sass/query.sass */
+  nav i {
+    margin: none !important;
+    padding: none !important;
+  }
+  /* line 17, ../../resources/sass/query.sass */
+  nav .logoutA {
+    position: initial !important;
+    -webkit-transform: none !important;
+        -ms-transform: none !important;
+            transform: none !important;
+    left: unset !important;
+  }
+
+  /* line 22, ../../resources/sass/query.sass */
+  main {
+    display: contents !important;
+  }
+  /* line 25, ../../resources/sass/query.sass */
+  main table th:nth-child(2), main table td:nth-child(2) {
+    display: none;
+  }
+}
+@media screen and (max-width: 650px) {
+  /* line 29, ../../resources/sass/query.sass */
+  .login main {
+    padding: 5.5rem 2rem 3rem 2rem !important;
+  }
+  /* line 32, ../../resources/sass/query.sass */
+  .login button {
+    margin-bottom: 1rem;
+  }
+  /* line 34, ../../resources/sass/query.sass */
+  .login .form-group:nth-child(1) {
+    margin-bottom: 1rem;
+  }
+}
+@media screen and (max-width: 500px) {
+  /* line 39, ../../resources/sass/query.sass */
+  .login main {
+    width: 80%;
+  }
+}

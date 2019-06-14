@@ -1,0 +1,158 @@
+/* line 7, ../../resources/sass/atomic.sass */
+li {
+  list-style: none;
+}
+
+/* line 9, ../../resources/sass/atomic.sass */
+.ff_cg {
+  font-family: Century Gothic;
+}
+
+/* line 11, ../../resources/sass/atomic.sass */
+.ff_arial {
+  font-family: Arial;
+}
+
+/* line 13, ../../resources/sass/atomic.sass */
+.easy_rounded {
+  border-radius: 6px;
+}
+
+/* line 15, ../../resources/sass/atomic.sass */
+.fw-bold {
+  font-weight: bold;
+}
+
+/* line 17, ../../resources/sass/atomic.sass */
+.b-0 {
+  bottom: 0 !important;
+}
+
+/* line 19, ../../resources/sass/atomic.sass */
+.l-0 {
+  left: 0 !important;
+}
+
+/* line 21, ../../resources/sass/atomic.sass */
+.r-0 {
+  right: 0 !important;
+}
+
+/* line 23, ../../resources/sass/atomic.sass */
+.t-0 {
+  top: 0 !important;
+}
+
+/* line 25, ../../resources/sass/atomic.sass */
+.d-grid {
+  display: grid;
+}
+
+/* line 28, ../../resources/sass/atomic.sass */
+.bg-moja-tmava {
+  background-color: #282828;
+}
+
+/* line 30, ../../resources/sass/atomic.sass */
+.bg-siva {
+  background-color: #ebebeb;
+}
+
+/* line 32, ../../resources/sass/atomic.sass */
+.color_siva {
+  color: #ebebeb;
+}
+
+/* line 34, ../../resources/sass/atomic.sass */
+.pointer {
+  cursor: pointer;
+}
+
+/* line 36, ../../resources/sass/atomic.sass */
+.def_cursor {
+  cursor: default;
+}
+
+/* line 38, ../../resources/sass/atomic.sass */
+.abs_centerX {
+  left: 50%;
+  -webkit-transform: translatex(-50%);
+      -ms-transform: translatex(-50%);
+          transform: translatex(-50%);
+}
+
+/* line 42, ../../resources/sass/atomic.sass */
+.abs_centerY {
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+          transform: translateY(-50%);
+}
+
+/* line 46, ../../resources/sass/atomic.sass */
+.abs_center {
+  left: 50%;
+  top: 52%;
+  -webkit-transform: translate(-50%, -50%);
+      -ms-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+}
+
+/* line 51, ../../resources/sass/atomic.sass */
+.translY50 {
+  -webkit-transform: translateY(50%);
+      -ms-transform: translateY(50%);
+          transform: translateY(50%);
+}
+
+/* line 54, ../../resources/sass/atomic.sass */
+.translX50 {
+  -webkit-transform: translateX(50%);
+      -ms-transform: translateX(50%);
+          transform: translateX(50%);
+}
+
+/* line 57, ../../resources/sass/atomic.sass */
+.h-100vh {
+  height: 100vh;
+}
+
+/* line 60, ../../resources/sass/atomic.sass */
+.bott-shadow {
+  -webkit-box-shadow: 0px 8px 9px -1px #272222;
+          box-shadow: 0px 8px 9px -1px #272222;
+}
+
+/* line 62, ../../resources/sass/atomic.sass */
+.my_button {
+  border-radius: 30px;
+  padding: 8px 14px;
+  min-width: 8.5rem;
+  color: white;
+  background: #363636;
+}
+
+/* line 68, ../../resources/sass/atomic.sass */
+.zi-1 {
+  z-index: 1;
+}
+
+/* line 70, ../../resources/sass/atomic.sass */
+.zi-2 {
+  z-index: 2;
+}
+
+/* line 72, ../../resources/sass/atomic.sass */
+.text-shadow {
+  text-shadow: -1px 0 2px #000, 0 1px 2px #000, 1px 0 2px #000, 0 -1px 2px #000;
+}
+
+/* line 74, ../../resources/sass/atomic.sass */
+.bg-white {
+  background-color: white;
+}
+
+/* line 76, ../../resources/sass/atomic.sass */
+.h-100px {
+  height: 100px;
+}

@@ -1,0 +1,32 @@
+<body class="position-relative admin">
+
+	<div class="row h-100vh m-0 justify-content-center">
+		
+	<?php 	include_once '../resources/inc/_nav.php'; ?>
+
+	<main class="col-12 col-md-11 font_w_reg font_Arial offset-md-1 pl-3">
+		<div class="settings content bg-white container h-100">
+			
+			<div class="row align-items-center justify-content-center h-100">
+
+				<div class="col-2 d-grid h-100 align-content-center p-0 justify-content-center bg-siva">
+						<a href="/admin/settings/acc" class="<?php echo ($data["active"] == "acc")?"active":"" ?> ff_cg text-dark w-100 p-4">Nastavenia účtu</a>
+						<?php if ($data["masta"]==1): ?>
+							<a href="/admin/settings/mastaAccs" class="<?php echo ($data["active"] == "mastaAccs")?"active":"" ?> ff_cg text-dark w-100 p-4">Správa ostatných účtov</a>
+						<?php endif; ?>
+						<a href="/admin/settings/xy" class="ff_cg text-dark <?php echo ($data["active"] == "xy")?"active":"" ?> w-100 p-4">Nastavenia súradníc</a>
+				</div>	
+<div class="col-10 pl-4 d-grid h-100 align-content-center">
+				<div class="dropdown ff_cg position-absolute">
+  <button class="btn dropdown-toggle bg-light" type="button" data-toggle="dropdown">?
+  <span class="caret"></span></button>
+  	<div class="dropdown-menu dropdown-menu-right">
+  		<?php echo $data["helper"] ?>
+  	</div>
+</div>
+					<?php include_once $data["addFile"]; ?>
+				</div>
+			</div>
+		</div>
+	</main>
+	</div>

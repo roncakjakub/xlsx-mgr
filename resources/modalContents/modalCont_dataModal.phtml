@@ -1,0 +1,42 @@
+<span class="XLSX_modal_Date font_Arial fs-16" id="infoModalDate">10.4.2015</span>
+
+<div class="mt-5 text-center row headPart darkRow py-3 font_MW fs-18 clr-org">
+	<div class="col-3 column email">Email</div>
+	<div class="col-3 column name">Meno</div>
+	<div class="col-3 column notif">Poznámka</div>
+	<div class="col-3 column files">Súbory</div>
+</div>
+<div class="text-center row dataPart my-3 mb-4 text-center font_Arial fs-16">
+	<div class="col-3 column email" id="infoModalEmail"></div>
+	<div class="col-3 column name" id="infoModalName"></div>
+	<div class="col-3 column notif" id="infoModalNotif"></div>
+	<div class="col-3 column files" id="infoModalFiles"></div>
+</div>
+<div class="text-center row headPart darkRow py-3 font_MW fs-18 clr-org">
+	<div class="col-3 column email">IČO</div>
+	<div class="col-3 column date">DIČ</div>
+	<div class="col-3 column notif">PSČ</div>
+	<div class="col-3 column Oda_one">IP</div>
+</div>
+<div class="text-center row dataPart my-3 mb-4 text-center font_Arial fs-16">
+	<div class="col-3 column email">1321456</div>
+	<div class="col-3 column date">564613</div>
+	<div class="col-3 column notif">654446</div>
+	<div class="col-3 column Oda_one">10.10.10.2</div>
+</div>
+
+<div class="row justify-content-between">
+	<div class="col-5 left font_MS">
+		<span class="clr-org mr-3 font_w_bold">Status/</span>
+		<span class="font_w_reg" id="infoModaldateDIff"></span>
+	</div>
+	<div class="col-6 right font-right buttons">
+		<a class="edit pl-0 button pr-3 mr-2 py-1" href="./update"><i class="pt-1 mr-2 far fa-edit"></i> Uprav</a>
+		<a id="infoModalDownloadButton" class="py-1 download pl-0 button pr-3 mr-2" href=""><i class="pt-1 mr-2 fas fa-download"></i> Stiahni</a>
+
+		<form action="/admin/delete" id="infoModalDeleteForm" class="m-0" method="POST">
+						<input type="hidden" name="xlsxID">
+						<input type="hidden" name="area">
+		<button class="delete pl-0 button pr-3 mr-2"><i class="pt-1 mr-2 fas fa-trash-alt"></i> Odstráň</button>	</form>
+	</div>
+</div>

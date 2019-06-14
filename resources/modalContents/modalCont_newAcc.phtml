@@ -1,0 +1,19 @@
+<form method="POST" class="col-12">
+  <div class="form-group">
+    <label for="email" class="fw-bold ff-cg my-2 col-12">Emailová adresa</label>
+    <input type="email" required="" class="easy_rounded form-control" id="email" name="newAccEmail">
+  </div>
+  <div class="form-group">
+    <label for="pass" class="fw-bold ff-cg my-2 col-12">Heslo</label>
+    <input type="password" required="" class="easy_rounded form-control" name="password" id="pass" placeholder="Heslo">
+  </div>
+  <div class="form-group" >
+    <label for="confirmpwd" class="fw-bold ff-cg my-2 col-12">Potvrdenie hesla</label>
+    <input type="password" required="" class="easy_rounded form-control" name="confirmpwd" id="confirmpwd" placeholder="Heslo">
+  </div>
+  <button type="button" class="my_button offset-4" onclick="regformhash(this.form,
+                                   this.form.newAccEmail,
+                                   this.form.password,
+                                   this.form.confirmpwd);" />Uložiť</button>  
+  
+</form>

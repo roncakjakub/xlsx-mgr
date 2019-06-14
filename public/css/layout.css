@@ -1,0 +1,789 @@
+/* line 7, ../../resources/sass/layout.sass */
+html {
+  font-size: 14px;
+}
+
+/* line 7, ../../resources/sass/atomic.sass */
+li {
+  list-style: none;
+}
+
+/* line 9, ../../resources/sass/atomic.sass */
+.ff_cg {
+  font-family: Century Gothic;
+}
+
+/* line 11, ../../resources/sass/atomic.sass */
+.ff_arial {
+  font-family: Arial;
+}
+
+/* line 13, ../../resources/sass/atomic.sass */
+.easy_rounded {
+  border-radius: 6px;
+}
+
+/* line 15, ../../resources/sass/atomic.sass */
+.fw-bold {
+  font-weight: bold;
+}
+
+/* line 17, ../../resources/sass/atomic.sass */
+.b-0 {
+  bottom: 0 !important;
+}
+
+/* line 19, ../../resources/sass/atomic.sass */
+.l-0 {
+  left: 0 !important;
+}
+
+/* line 21, ../../resources/sass/atomic.sass */
+.r-0 {
+  right: 0 !important;
+}
+
+/* line 23, ../../resources/sass/atomic.sass */
+.t-0 {
+  top: 0 !important;
+}
+
+/* line 25, ../../resources/sass/atomic.sass */
+.d-grid {
+  display: grid;
+}
+
+/* line 28, ../../resources/sass/atomic.sass */
+.bg-moja-tmava {
+  background-color: #282828;
+}
+
+/* line 30, ../../resources/sass/atomic.sass */
+.bg-siva {
+  background-color: #ebebeb;
+}
+
+/* line 32, ../../resources/sass/atomic.sass */
+.color_siva {
+  color: #ebebeb;
+}
+
+/* line 34, ../../resources/sass/atomic.sass */
+.pointer {
+  cursor: pointer;
+}
+
+/* line 36, ../../resources/sass/atomic.sass */
+.def_cursor {
+  cursor: default;
+}
+
+/* line 38, ../../resources/sass/atomic.sass */
+.abs_centerX {
+  left: 50%;
+  -webkit-transform: translatex(-50%);
+      -ms-transform: translatex(-50%);
+          transform: translatex(-50%);
+}
+
+/* line 42, ../../resources/sass/atomic.sass */
+.abs_centerY {
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+          transform: translateY(-50%);
+}
+
+/* line 46, ../../resources/sass/atomic.sass */
+.abs_center {
+  left: 50%;
+  top: 52%;
+  -webkit-transform: translate(-50%, -50%);
+      -ms-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+}
+
+/* line 51, ../../resources/sass/atomic.sass */
+.translY50 {
+  -webkit-transform: translateY(50%);
+      -ms-transform: translateY(50%);
+          transform: translateY(50%);
+}
+
+/* line 54, ../../resources/sass/atomic.sass */
+.translX50 {
+  -webkit-transform: translateX(50%);
+      -ms-transform: translateX(50%);
+          transform: translateX(50%);
+}
+
+/* line 57, ../../resources/sass/atomic.sass */
+.h-100vh {
+  height: 100vh;
+}
+
+/* line 60, ../../resources/sass/atomic.sass */
+.bott-shadow {
+  -webkit-box-shadow: 0px 8px 9px -1px #272222;
+          box-shadow: 0px 8px 9px -1px #272222;
+}
+
+/* line 62, ../../resources/sass/atomic.sass */
+.my_button {
+  border-radius: 30px;
+  padding: 8px 14px;
+  min-width: 8.5rem;
+  color: white;
+  background: #363636;
+}
+
+/* line 68, ../../resources/sass/atomic.sass */
+.zi-1 {
+  z-index: 1;
+}
+
+/* line 70, ../../resources/sass/atomic.sass */
+.zi-2 {
+  z-index: 2;
+}
+
+/* line 72, ../../resources/sass/atomic.sass */
+.text-shadow {
+  text-shadow: -1px 0 2px #000, 0 1px 2px #000, 1px 0 2px #000, 0 -1px 2px #000;
+}
+
+/* line 74, ../../resources/sass/atomic.sass */
+.bg-white {
+  background-color: white;
+}
+
+/* line 76, ../../resources/sass/atomic.sass */
+.h-100px {
+  height: 100px;
+}
+
+/* line 7, ../../resources/sass/text.sass */
+.clr-green {
+  color: #00ff12 !important;
+}
+
+/* line 9, ../../resources/sass/text.sass */
+.clr-red {
+  color: #ff0000 !important;
+}
+
+/* line 11, ../../resources/sass/text.sass */
+.clr-org {
+  color: #f5981e !important;
+}
+
+/* line 13, ../../resources/sass/text.sass */
+.clr-black {
+  color: black !important;
+}
+
+/* line 15, ../../resources/sass/text.sass */
+.clr-siva {
+  color: #ebebeb !important;
+}
+
+/* line 17, ../../resources/sass/text.sass */
+.clr-white {
+  color: white !important;
+}
+
+/* line 19, ../../resources/sass/text.sass */
+.font_Arial {
+  font-family: Arial;
+}
+
+/* line 21, ../../resources/sass/text.sass */
+.font_MW {
+  font-family: Merriweather;
+}
+
+/* line 23, ../../resources/sass/text.sass */
+.font_CRD {
+  font-family: Cardo;
+}
+
+/* line 25, ../../resources/sass/text.sass */
+.font_FA {
+  font-family: fontAwesome;
+}
+
+/* line 27, ../../resources/sass/text.sass */
+.font_MS {
+  font-family: Montserrat;
+}
+
+/* line 29, ../../resources/sass/text.sass */
+.about {
+  color: #c9c9c9;
+}
+
+/* line 31, ../../resources/sass/text.sass */
+.font_w_reg {
+  font-weight: normal;
+}
+
+/* line 33, ../../resources/sass/text.sass */
+.font_w_bold {
+  font-weight: bold;
+}
+
+/* line 35, ../../resources/sass/text.sass */
+.fs-12 {
+  font-size: 0.75em;
+}
+
+/* line 37, ../../resources/sass/text.sass */
+.fs-16 {
+  font-size: 1em;
+}
+
+/* line 39, ../../resources/sass/text.sass */
+.fs-18 {
+  font-size: 1.125em;
+}
+
+/* line 41, ../../resources/sass/text.sass */
+.fs-20 {
+  font-size: 1.25em;
+}
+
+/* line 43, ../../resources/sass/text.sass */
+.fs-22 {
+  font-size: 1.375em;
+}
+
+/* line 45, ../../resources/sass/text.sass */
+.fs-24 {
+  font-size: 1.5em;
+}
+
+/* line 47, ../../resources/sass/text.sass */
+.fs-26 {
+  font-size: 1.625em;
+}
+
+/* line 49, ../../resources/sass/text.sass */
+.fs-29 {
+  font-size: 1.813em;
+}
+
+/* line 51, ../../resources/sass/text.sass */
+.fs-30 {
+  font-size: 1.875em;
+}
+
+/* line 53, ../../resources/sass/text.sass */
+.fs-31 {
+  font-size: 1.938em;
+}
+
+/* line 55, ../../resources/sass/text.sass */
+.fs-36 {
+  font-size: 2.25em;
+}
+
+/* line 11, ../../resources/sass/layout.sass */
+body {
+  font-family: "Merriweather", serif;
+}
+
+/**body* */
+/* line 15, ../../resources/sass/layout.sass */
+body {
+  min-height: 100vh;
+  background-color: #ebebeb;
+}
+
+/* line 18, ../../resources/sass/layout.sass */
+.modal-header {
+  padding: 9px 15px;
+  border-bottom: 1px solid #eee;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+/* line 24, ../../resources/sass/layout.sass */
+.btn-view, .btn-delete {
+  background: none;
+  font-size: 1.3rem;
+}
+/* line 27, ../../resources/sass/layout.sass */
+.btn-view:focus, .btn-delete:focus {
+  -webkit-box-shadow: none;
+          box-shadow: none;
+}
+
+/* line 32, ../../resources/sass/layout.sass */
+.btn-view i {
+  color: #3fb32d;
+}
+
+/* line 37, ../../resources/sass/layout.sass */
+.btn-delete i {
+  color: red;
+}
+
+/* line 40, ../../resources/sass/layout.sass */
+.modal-success .modal-header {
+  background-color: #283cff;
+  border-color: #283cff;
+  color: white;
+}
+/* line 44, ../../resources/sass/layout.sass */
+.modal-success .modal-body {
+  display: none;
+}
+/* line 46, ../../resources/sass/layout.sass */
+.modal-success button {
+  color: white;
+}
+
+/* line 49, ../../resources/sass/layout.sass */
+.modal-error .modal-header {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+/* line 52, ../../resources/sass/layout.sass */
+.modal-error .modal-body {
+  display: none;
+}
+/* line 54, ../../resources/sass/layout.sass */
+.modal-error button {
+  color: white;
+}
+
+/* line 57, ../../resources/sass/layout.sass */
+.darkRow {
+  background: #333333 none repeat scroll 0% 0%;
+}
+
+/* line 60, ../../resources/sass/layout.sass */
+#XLSXModal .buttons .button i {
+  height: 1.7rem;
+  width: 1.7rem;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* line 67, ../../resources/sass/layout.sass */
+#XLSXModal .XLSX_modal_Date {
+  color: #444;
+}
+/* line 69, ../../resources/sass/layout.sass */
+#XLSXModal .headPart {
+  text-transform: uppercase;
+}
+/* line 72, ../../resources/sass/layout.sass */
+#XLSXModal .dataPart a {
+  color: black;
+}
+/* line 74, ../../resources/sass/layout.sass */
+#XLSXModal .dataPart .column + .column {
+  border-left: 1px solid black;
+}
+/* line 77, ../../resources/sass/layout.sass */
+#XLSXModal .buttons form {
+  display: inline;
+}
+/* line 79, ../../resources/sass/layout.sass */
+#XLSXModal .buttons .button {
+  height: 2rem;
+  border-radius: 1rem;
+}
+/* line 82, ../../resources/sass/layout.sass */
+#XLSXModal .buttons .button i {
+  border-radius: 1rem;
+}
+/* line 85, ../../resources/sass/layout.sass */
+#XLSXModal .buttons .button + .button {
+  margin-left: 0.5rem;
+}
+/* line 87, ../../resources/sass/layout.sass */
+#XLSXModal .buttons .edit {
+  color: #20bc36;
+  background-color: white;
+  border: 1px solid #b1aeae;
+}
+/* line 88, ../../resources/sass/layout.sass */
+#XLSXModal .buttons .edit i {
+  background-color: #20bc36;
+  color: white;
+}
+/* line 94, ../../resources/sass/layout.sass */
+#XLSXModal .buttons .download {
+  color: #333;
+  background-color: white;
+  border: 1px solid #b1aeae;
+}
+/* line 95, ../../resources/sass/layout.sass */
+#XLSXModal .buttons .download i {
+  background-color: #333;
+  color: white;
+}
+/* line 101, ../../resources/sass/layout.sass */
+#XLSXModal .buttons .delete {
+  color: white;
+  background-color: #f00;
+  border: 1px solid #f00;
+}
+/* line 102, ../../resources/sass/layout.sass */
+#XLSXModal .buttons .delete i {
+  color: #f00;
+  background-color: white;
+}
+
+/* line 109, ../../resources/sass/layout.sass */
+.login {
+  background-image: url("../img/back_main.png");
+  background-size: cover;
+}
+/* line 113, ../../resources/sass/layout.sass */
+.login main {
+  padding: 5.5rem 9rem 3rem 9rem !important;
+  background-color: rgba(1, 1, 50, 0.8);
+  border-bottom-left-radius: 40px;
+  border-top-right-radius: 40px;
+}
+/* line 118, ../../resources/sass/layout.sass */
+.login main canvas {
+  z-index: -1;
+}
+/* line 120, ../../resources/sass/layout.sass */
+.login main h2 {
+  font-size: 1.3rem;
+}
+/* line 122, ../../resources/sass/layout.sass */
+.login main img {
+  width: 7rem;
+  height: auto;
+}
+/* line 125, ../../resources/sass/layout.sass */
+.login main button {
+  font-size: 1rem;
+  background-color: #1d1d1d;
+  padding: 0.1rem 2rem;
+  border-color: #1d1d1d;
+}
+
+/* line 130, ../../resources/sass/layout.sass */
+.upload {
+  background-image: url("../img/back_upload.png");
+  background-size: cover;
+}
+/* line 134, ../../resources/sass/layout.sass */
+.upload .names {
+  display: inline-block;
+  overflow-x: auto;
+  width: 19rem;
+  scrollbar-width: thin;
+  scrollbar-color: #626dd4 gray;
+}
+/* line 140, ../../resources/sass/layout.sass */
+.upload main {
+  background-color: rgba(255, 255, 255, 0.63);
+}
+/* line 142, ../../resources/sass/layout.sass */
+.upload main .myform {
+  width: 30rem;
+}
+/* line 144, ../../resources/sass/layout.sass */
+.upload label {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  background: rgba(255, 255, 255, 0.63);
+  white-space: nowrap;
+  -webkit-box-shadow: 0px 0 8px 1px gray;
+          box-shadow: 0px 0 8px 1px gray;
+}
+/* line 150, ../../resources/sass/layout.sass */
+.upload label i {
+  border-right: black 1px solid;
+}
+/* line 152, ../../resources/sass/layout.sass */
+.upload label span {
+  color: #545252;
+}
+/* line 155, ../../resources/sass/layout.sass */
+.upload h2 {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+/* line 158, ../../resources/sass/layout.sass */
+.upload .logo {
+  background-color: #3d3d3d;
+}
+/* line 160, ../../resources/sass/layout.sass */
+.upload .logo img {
+  width: auto;
+  height: 35px;
+}
+/* line 164, ../../resources/sass/layout.sass */
+.upload button {
+  font-size: 1rem;
+  background-color: #1d1d1d;
+  padding: 0.1rem 2rem;
+  border-color: #1d1d1d;
+}
+
+/* line 170, ../../resources/sass/layout.sass */
+.admin .form-control:focus {
+  border-color: #7380f8;
+}
+/* line 172, ../../resources/sass/layout.sass */
+.admin .side_nav {
+  background-color: #333;
+  position: fixed;
+  width: 9%;
+  left: 0;
+  height: 100%;
+  -webkit-transition: 0.3s;
+  -o-transition: 0.3s;
+  transition: 0.3s;
+  top: 0;
+  z-index: 5;
+}
+/* line 181, ../../resources/sass/layout.sass */
+.admin .side_nav .badge {
+  color: white;
+  font-size: 0.8rem;
+  font-weight: initial;
+  border-radius: 50%;
+  bottom: -8px;
+  right: -8px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  height: 20px;
+  min-width: 20px;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  background: #283cff;
+}
+/* line 194, ../../resources/sass/layout.sass */
+.admin .logo_div {
+  margin-top: 30px;
+  text-align: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+/* line 200, ../../resources/sass/layout.sass */
+.admin .logo_div img {
+  height: 8rem;
+}
+/* line 203, ../../resources/sass/layout.sass */
+.admin .logo_div .brand_logo {
+  overflow: hidden;
+  color: white;
+  width: 0;
+  -webkit-transition: 0.3s;
+  -o-transition: 0.3s;
+  transition: 0.3s;
+  font-size: 1.2em;
+  white-space: nowrap;
+}
+/* line 211, ../../resources/sass/layout.sass */
+.admin .brand {
+  width: 100%;
+  text-align: center;
+  color: white;
+  font-size: 1.2em;
+  margin: 15px 0;
+  -webkit-transition: 0.1s;
+  -o-transition: 0.1s;
+  transition: 0.1s;
+}
+/* line 220, ../../resources/sass/layout.sass */
+.admin .menu_item a {
+  color: white;
+  text-decoration: none;
+  margin-top: 20px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  width: 100%;
+  -webkit-transition: 0.3s;
+  -o-transition: 0.3s;
+  transition: 0.3s;
+}
+/* line 229, ../../resources/sass/layout.sass */
+.admin .menu_item a i {
+  font-size: 2em;
+}
+/* line 231, ../../resources/sass/layout.sass */
+.admin .menu_item a p {
+  opacity: 0;
+  width: 0;
+  margin: 0;
+  padding-left: 0px;
+  white-space: nowrap;
+  text-align: left;
+  -webkit-transition: 0.3s;
+  -o-transition: 0.3s;
+  transition: 0.3s;
+}
+/* line 240, ../../resources/sass/layout.sass */
+.admin .menu_div {
+  height: 60vh;
+  height-display: flex;
+  height-justify-content: center;
+  height-align-items: center;
+  height-flex-direction: column;
+}
+/* line 247, ../../resources/sass/layout.sass */
+.admin .logout {
+  width: 100%;
+  width-text-align: center;
+  width-position: absolute;
+  width-bottom: 20px;
+}
+/* line 253, ../../resources/sass/layout.sass */
+.admin .side_nav:hover {
+  width: 19%;
+}
+/* line 256, ../../resources/sass/layout.sass */
+.admin .side_nav:hover .logo_div .brand_logo {
+  width: 9rem;
+  padding-left: 9px;
+}
+/* line 260, ../../resources/sass/layout.sass */
+.admin .side_nav:hover .brand {
+  opacity: 0;
+}
+/* line 263, ../../resources/sass/layout.sass */
+.admin .side_nav:hover .menu_item a p {
+  padding-left: 20px;
+  width: 100px;
+  opacity: 1;
+}
+/* line 269, ../../resources/sass/layout.sass */
+.admin .settings .dropdown {
+  top: 15px;
+  right: 15px;
+}
+/* line 272, ../../resources/sass/layout.sass */
+.admin .settings .active {
+  background-color: white;
+}
+/* line 274, ../../resources/sass/layout.sass */
+.admin .header {
+  background-color: #282828;
+  color: #f5981e;
+}
+/* line 277, ../../resources/sass/layout.sass */
+.admin .header .search input {
+  border-radius: 10px;
+}
+/* line 279, ../../resources/sass/layout.sass */
+.admin #navArrow {
+  width: 30px;
+  height: 30px;
+  -webkit-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+          transform: rotate(45deg);
+  background-color: grey;
+  display: none;
+}
+/* line 287, ../../resources/sass/layout.sass */
+.admin .chartNav .active #navArrow {
+  display: block;
+}
+/* line 290, ../../resources/sass/layout.sass */
+.admin .table td {
+  vertical-align: middle;
+}
+/* line 292, ../../resources/sass/layout.sass */
+.admin .dynatable-active-page {
+  color: white;
+  background-color: #999999;
+}
+
+/* line 295, ../../resources/sass/layout.sass */
+footer {
+  background-color: #ebebeb;
+}
+
+@media screen and (max-width: 992px) {
+  /* line 6, ../../resources/sass/query.sass */
+  .login main {
+    padding: 5.5rem 5rem 3rem 5rem !important;
+  }
+}
+@media screen and (max-width: 768px) {
+  /* line 10, ../../resources/sass/query.sass */
+  nav {
+    -webkit-box-shadow: 0px 1px 11px 6px #302f2f !important;
+            box-shadow: 0px 1px 11px 6px #302f2f !important;
+    height: -webkit-max-content !important;
+    height: -moz-max-content !important;
+    height: max-content !important;
+    position: relative !important;
+  }
+  /* line 14, ../../resources/sass/query.sass */
+  nav i {
+    margin: none !important;
+    padding: none !important;
+  }
+  /* line 17, ../../resources/sass/query.sass */
+  nav .logoutA {
+    position: initial !important;
+    -webkit-transform: none !important;
+        -ms-transform: none !important;
+            transform: none !important;
+    left: unset !important;
+  }
+
+  /* line 22, ../../resources/sass/query.sass */
+  main {
+    display: contents !important;
+  }
+  /* line 25, ../../resources/sass/query.sass */
+  main table th:nth-child(2), main table td:nth-child(2) {
+    display: none;
+  }
+}
+@media screen and (max-width: 650px) {
+  /* line 29, ../../resources/sass/query.sass */
+  .login main {
+    padding: 5.5rem 2rem 3rem 2rem !important;
+  }
+  /* line 32, ../../resources/sass/query.sass */
+  .login button {
+    margin-bottom: 1rem;
+  }
+  /* line 34, ../../resources/sass/query.sass */
+  .login .form-group:nth-child(1) {
+    margin-bottom: 1rem;
+  }
+}
+@media screen and (max-width: 500px) {
+  /* line 39, ../../resources/sass/query.sass */
+  .login main {
+    width: 80%;
+  }
+}

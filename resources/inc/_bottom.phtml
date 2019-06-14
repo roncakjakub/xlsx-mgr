@@ -1,0 +1,21 @@
+<script src="/public/js/jQuery.js"></script>
+<?php if (isset($_SESSION["alert"])):?>
+<script>
+    $(document).ready(function(){
+    $('#notifOKMod').modal('show');
+         });
+    </script>
+<?php 
+unset($_SESSION["alert"]);
+endif; ?>
+<script src="/public/js/jquery.dynatable.js"></script>
+<script src="/public/js/popper.js"></script>
+<script src="/public/js/bootstrap.js"></script>
+<script src="/public/js/functions.js"></script>
+<script src="/public/js/sha512.js"></script>
+<script src="/public/js/login.js"></script>
+<script src="/public/js/dropzone.js"></script>
+<script src="/public/js/chartist.min.js"></script>
+<script src="/public/js/script.js"></script>
+</body>
+</html>

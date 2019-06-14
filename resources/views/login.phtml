@@ -1,0 +1,23 @@
+<body class="position-relative login">
+	<main class="position-absolute abs_center d-block p-4 ff-cg">
+		<canvas id="cornerLines" class="l-0 t-0 w-100 h-100 position-absolute"></canvas>
+		<img src="../public/img/logo.png" class="position-absolute abs_center t-0" alt="Logo">
+		<h2 class="ff_Ms_bold text-center pb-2 text-white">Prihlásenie</h2>
+					<form action="" method="POST" class="" name="login_form">
+						<div class="form-group bord_b_2 row bg-white justify-content-center align-items-center mx-0 easy_rounded">
+							<label for="email" class="col-3 col-sm-2 mb-0 color_ccc"><i class="fas fa-user"></i></label>
+							<input type="email" name="email" required class="col-9 col-sm-10 px-1 form-control" id="email" placeholder="Email">
+						</div>
+						<div class="form-group bord_b_2 row mb-5 mx-0 bg-white justify-content-center align-items-center easy_rounded">
+							<label for="email" class="col-3 col-sm-2 mb-0 color_ccc"><i class="fas fa-lock"></i></label>
+							<input type="password" name="password" class="col-9 col-sm-10 px-1 form-control" id="pass" placeholder="Heslo">
+						</div>
+						 <button type="submit" class="border-0 mb-2 text-light row mx-auto easy_rounded" onclick="formhash(this.form, this.form.password);"
+
+						>Login</button>
+						<div class="row">
+						<a href="" class="">Odísť</a>
+						<a href="" class="ml-auto">Gmail</a>
+						</div>
+					</form>
+	</main>

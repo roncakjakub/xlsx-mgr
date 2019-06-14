@@ -1,0 +1,48 @@
+<body class="position-relative admin">
+	<div class="row h-100vh m-0">
+		
+	<?php 	include_once '../resources/inc/_nav.php'; ?>
+
+	<main class="col-12 col-md-11 font_w_reg offset-md-1 pt-4 pl-3">
+		
+		<div class="content font_Arial bg-white container h-100 pt-3">
+<?php 
+if ($data["preparedData"]!=false){ ?>	
+		<table class="fs-16 table table-striped" id="my-final-table">
+	  <thead class="text-center">
+	<script type="text/javascript">var poleJSON=<?php echo $data["preparedData"]; ?></script>
+	  	<?php 
+	  	$tableHeads = array("name"=>'Meno',"email"=>'E-mail',"enddate"=>'Konečný dátum',"notif"=>'Poznámka',"modal"=>'',"edit"=>'',"delete"=>''); 
+    	foreach ($tableHeads as $tag => $tableHead):?>
+			<th class="ff_cg clr-org" scope="col" data-dynatable-sorts="<?php echo $tag ?>" data-dynatable-column="<?php echo $tag ?>"><?php echo $tableHead ?></th>
+		<?php endforeach; ?>
+  </thead>
+  <tbody>
+
+  </tbody>
+</table>
+<?php } else{ ?>
+	<div class="row pt-2">
+		<div class="col-12 text-center fw-bold ff-cg">
+			Práve tu nie je žiadny obsah
+		</div>
+	</div>
+	<?php } ?>
+		</div>
+	</main>
+	</div>
+<script type="text/javascript">
+	document.addEventListener('DOMContentLoaded', function(){
+	<?php if($data["preparedData"]!=false){ ?>
+$('#my-final-table').dynatable({
+  dataset: {
+    records: poleJSON
+  }
+});
+if ($(".btn-view.active").length>0) {
+	$(".btn-view.active").closest("tr").css({"background":"#333","color":"white"});
+}
+
+<?php } ?>
+});
+</script>

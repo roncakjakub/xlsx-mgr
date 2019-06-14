@@ -1,0 +1,55 @@
+	<form method="POST" class="col-6">
+		<div class="row">
+			<span class="fw-bold ff-cg my-2 col-12">Nastavenie mena</span>
+		<div class="form-group col-6">
+		    <label for="nameX" class="d-inline-block mr-2 ff_arial">X</label>
+		    <input type="number" class="d-inline-block col-10 easy_rounded form-control" id="nameX" min="0" step="1" max="20" name="nameX" value="<?php echo $data["XML"]->name->x ?>">
+	  </div>
+	  <div class="form-group col-6">
+		    <label for="nameY" class="d-inline-block mr-2 ff_arial">Y</label>
+		    <input type="number" class="d-inline-block col-10 easy_rounded form-control" id="nameY" min="0" step="1" max="20" value="<?php echo $data["XML"]->name->y ?>" name="nameY">
+	  </div>
+			<span class="fw-bold ff-cg my-2 col-12">Nastavenie emailu</span>
+	<div class="form-group col-6">
+		    <label for="emailX" class="d-inline-block mr-2 ff_arial">X</label>
+		    <input type="number" class="d-inline-block col-10 easy_rounded form-control" id="emailX" min="0" step="1" max="20" value="<?php echo $data["XML"]->email->x ?>" name="emailX">
+	  </div>
+	  <div class="form-group col-6">
+		    <label for="emailY" class="d-inline-block mr-2 ff_arial">Y</label>
+		    <input type="number" class="d-inline-block col-10 easy_rounded form-control" id="emailY" min="0" step="1" max="20" value="<?php echo $data["XML"]->email->y ?>" name="emailY">
+	  </div>
+			<span class="fw-bold ff-cg my-2 col-12">Nastavenie dátumu vypršania platnosti</span>
+	 <div class="form-group col-6">
+		    <label for="endDateX" class="d-inline-block mr-2 ff_arial">X</label>
+		    <input type="number" class="d-inline-block col-10 easy_rounded form-control" id="endDateX" min="0" step="1" max="20" value="<?php echo $data["XML"]->endDate->x ?>" name="endDateX">
+	  </div>
+	  <div class="form-group col-6">
+		    <label for="endDateY" class="d-inline-block mr-2 ff_arial">Y</label>
+		    <input type="number" class="d-inline-block col-10 easy_rounded form-control" id="endDateY" min="0" step="1" max="20" value="<?php echo $data["XML"]->endDate->y ?>" name="endDateY">
+	  </div>
+	  <span class="fw-bold ff-cg my-2 col-12">Nastavenie poznámky</span>
+	<div class="form-group col-6">
+		    <label for="notifX" class="d-inline-block mr-2 ff_arial">X</label>
+		    <input type="number" class="d-inline-block col-10 easy_rounded form-control" id="notifX" min="0" step="1" max="20" value="<?php echo $data["XML"]->notif->x ?>" name="notifX">
+	  </div>
+	  <div class="form-group col-6">
+		    <label for="notifY" class="d-inline-block mr-2 ff_arial">Y</label>
+		    <input type="number" class="d-inline-block col-10 easy_rounded form-control" id="notifY" min="0" step="1" max="20" value="<?php echo $data["XML"]->notif->y ?>" name="notifY">
+	  </div>
+			<span class="fw-bold ff-cg my-2 col-12">Nastavenie nakúpených položiek</span>
+	<div class="form-group col-6">
+		
+		    <label for="productsY" class="ff_arial">Y-ová súradnica 1. produktu</label>
+		    <input type="number" class="easy_rounded form-control" id="productsY" min="0" step="1" max="20" value="<?php echo $data["XML"]->aboutMinRow ?>" name="productsY">
+	  </div>
+	  <div class="form-group col-6">
+		    <label for="productX" class="ff_arial">X-ová súradnica produktu</label>
+		    <input type="number" class="easy_rounded form-control" id="productX" min="0" step="1" max="20" value="<?php echo $data["XML"]->productX ?>" name="productX">
+	  </div>
+	  <div class="form-group col-6">
+		    <label for="priceX" class="ff_arial">X-ová súradnica ceny</label>
+		    <input type="number" class="easy_rounded form-control" id="priceX" min="0" step="1" max="20" value="<?php echo $data["XML"]->priceX ?>" name="priceX">
+	  </div>
+		</div>
+	  <button type="submit" class="col-4 offset-4 my_button">Odošli</button>
+	</form>

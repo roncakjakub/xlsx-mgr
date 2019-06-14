@@ -1,0 +1,21 @@
+<body class="position-relative upload">
+	<main class="position-absolute abs_center">
+		<div class="w-100 text-center logo">
+		<img src="../public/img/mail/logoPROBIM.png" class="my-3" alt="Logo"> 
+		</div>
+		<div class="pt-4 px-5 pb-5 myform mx-5">
+			
+		<h2 class="ff_cg text-center">Prosím, sem priložte vaše súbory</h2>
+					<form action="" method="POST" enctype="multipart/form-data" name="login_form">
+						<div class="form-group bord_b_2 row justify-content-center mx-0 mb-0">
+							<input multiple="" oninput="uploadFileName(this)" type="file" name="checkPaymentFile[]" class="col-10 px-0 form-control" id="file" placeholder="Password" aria-describedby="uplhelp" style="display: none">
+							<label for="file" class="col-12 mb-0 color_ccc easy_rounded"><i class="pr-3 mr-3 my-2 fas fa-folder"></i><div class="names"><span>Vaše súbory</span></div></label>
+							<small id="uplHelp" class="form-text text-muted">Povolené formáty - PDF, JPG, TIFF, BMP, PNG</small>
+						</div>
+						<input name="fileName" type="hidden" value="<?php echo $data["fileName"] ?>">
+						<div class="row m-0 mt-3 justify-content-center align-items-center">
+						 <button type="submit" class="my_button btn">Odošli</button>
+						</div>
+					</form>
+		</div>
+	</main>

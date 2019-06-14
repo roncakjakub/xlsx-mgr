@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doc>
+	<name>
+		<x>0</x>
+		<y>0</y>
+	</name>
+	<email>
+		<x>0</x>
+		<y>1</y>
+	</email>
+	<notif>
+		<x>1</x>
+		<y>0</y>
+	</notif>
+	<endDate>
+		<x>1</x>
+		<y>1</y>
+	</endDate>
+	<aboutMinRow>2</aboutMinRow>
+	<productX>0</productX>
+	<priceX>1</priceX>
+	<lastName>0</lastName>
+</doc>

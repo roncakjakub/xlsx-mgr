@@ -1,0 +1,26 @@
+			<thead class="clr-org text-center">
+				<tr>
+					<?php $tableHeads = array("obj"=>'Objekt',"mail"=>'E-mail',"initDate"=>'Počiatočný dátum',"endDate"=>'Konečný dátum',"notic"=>'Poznámka'); 
+					foreach ($tableHeads as $tag => $tableHead):?>
+					<th scope="col"><?php echo $tableHead ?> <i onclick="sort(<?php echo $tag ?>)" class="fas fa-angle-down"></i></th>
+					<?php endforeach; ?>
+					<th scope="col"></th>
+					<th scope="col"></th>
+				</tr>
+				</thead>
+				<tbody>
+					<?php foreach ($data["xlsxData"] as $key => $fileData):?>
+				<tr>
+				<th scope="row">Objekt <?php echo $key+1 ?></th>
+				<td class="text-center"><?php echo $fileData["email"] ?></td>
+				<td class="text-center"><?php echo date("j. M Y", strtotime($fileData["initdate"])); ?></td>
+				<td class="text-center"><?php echo date("j. M Y", strtotime($fileData["enddate"])); ?></td>
+				<td class="text-center">Moje poznámka</td>
+				<td><a href="" class="fs-16 action"><i class="clr-green fas fa-edit"></i> Upraviť</a></td>
+				<td><form action="/admin/delete" class="m-0" method="POST">
+					<input type="hidden" name="xlsxID" value="<?php echo $fileData["fileName"]?>">
+					<button class="fs-16 action" type="button" onclick="delCheck(this)"><i class="clr-red fas fa-times-circle"></i> Odstrániť</button></td>
+
+				</tr>
+			<?php endforeach; ?>
+			</tbody>
