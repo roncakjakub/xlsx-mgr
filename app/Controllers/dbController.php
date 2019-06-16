@@ -17,13 +17,13 @@ class DbController
      * @return bool
      */
 
-	function select($table,$cols,$where=NULL,$orderby=NULL){
+	function select($table,$cols,$where=NULL,$join=NULL,$orderby=NULL){
 		/********************************
 			Ak jestem where, pridaj k nemu aj slovíčko do klauzuly.
 		********************************/
 		$where=($where)? "where ".$where : "" ;
 		$orderby=($orderby)? "order by ".$orderby : "" ;
-		return $this->pdo->query("SELECT ".$cols." FROM ".$table." ".$where." ".$orderby)->fetch();
+		return $this->pdo->query("SELECT ".$cols." FROM ".$table." ".$join." ".$where." ".$orderby);
 	}
 
 	/**
@@ -66,9 +66,36 @@ class DbController
 		********************************/
 
 		$qm = implode(',', array_fill(0, count($values), '?'));
-			var_dump($qm);die();
 		$sql = "INSERT INTO ".$table." (".$cols.") VALUES (".$qm.")";
 		return ($this->pdo->prepare($sql)->execute(array_values($values))?$this->pdo->lastInsertId():false);
+	}
+	/**
+     * @return array
+     */
+	
+		function getFullData($nazov){
+			$rowID=0;
+		/********************************
+			Zisti pocet prvkov v velues referencii
+		********************************/
+		$dbResult=$this->select("dataview","*","nazov=".$nazov);
+			while ($row=$dbResult->fetch()) {
+			$invArr=$this->select("investori","investori.*","inv_midd.riadok_fk=".$row["rowNO"], "join inv_midd on inv_midd.investor_fk=investori.ID");
+
+				//Ak je, v tomto prípade 0. prvok, NULL - riadok neexistuje 
+				$explodedDate=explode("-", $row["expDate"]);
+				$array[$rowID]["empty"]=0;
+				$array[$rowID]["name"]=$array[$rowID]["email"]=array();
+				while ($invRow=$invArr->fetch()) {
+					array_push($array[$rowID]["name"], $invRow["meno"]);
+					array_push($array[$rowID]["email"], $invRow["email"]);
+				}
+				$array[$rowID]["notif"]=$row["poznamka"];
+				$array[$rowID]["endDate"]=$explodedDate[2].".".$explodedDate[1].".".$explodedDate[0];	
+				$array[$rowID]["content"] = $row["obsah"];
+				$rowID++;
+ 			}
+			return $array;
 	}
 
 	/**

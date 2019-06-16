@@ -7,6 +7,7 @@
  	private $conf, $OtherModel,$dbCtrl;
  	public function __construct($om,$dbCtrl){
  		$this->OtherModel=$om;
+ 		$this->dbCtrl=$dbCtrl;
  	}
  	function configuration($confFile){
  	$xmlConf=simplexml_load_string(file_get_contents($confFile));
@@ -40,18 +41,13 @@
 				$endDate=$row[2];
 				$explodedDate=explode("/", $endDate);
 				$array[$rowID]["empty"]=0;
-				$array[$rowID]["name"]=$row[0];
-				$array[$rowID]["email"]=$row[1];
-				$array[$rowID]["notif"]=$row[3];
+				
+				$array[$rowID]["name"]=explode("<br />", nl2br($row[0]));
+				$array[$rowID]["email"]=explode("<br />", nl2br($row[1]));
+				$array[$rowID]["notif"]=nl2br($row[3]);
 				$array[$rowID]["endDate"]=$explodedDate[1].".".$explodedDate[0].".".$explodedDate[2];	
 				$popis_i=0;
-				for ($popisCols=4; $popisCols < sizeof($row); $popisCols+=2){
-					$popis[$popis_i] = $row[$popisCols];
-					$cena[$popis_i] = $row[$popisCols+1];
-					$popis_i++;
-				}
-				$array[$rowID]["popis"] = $popis;
-				$array[$rowID]["cena"] = $cena;
+				$array[$rowID]["content"] = nl2br($row[4]);;
 			}
 			return $array;
     	}
@@ -68,6 +64,7 @@
     	for ($i=$min; $i <= $max; $i++) 
 			$obj->getActiveSheet()
 				->setCellValue($i.$row, NULL);
+
     }
 	public function delXLSXRow($res,$fileName, $iArray){
 
@@ -78,8 +75,10 @@
 			$this->delCols($objPHPExcel,"A",$topCol,$index);
 			// Potom odstráň konfig. súbory
 			$this->delete($res."/neov_platby/".$fileName."/".$index);
+			// Odstránenie z DB
+			$rowID=$this->dbCtrl->getID("dataview","nazov= ".$fileName."and rowNO = ".$index);
+			$this->dbCtrl->delete("riadky","ID=".$rowID);
 		}
-
 		$this->saveXLSX($objPHPExcel, $res,$fileName);
 		return true;
 	}
@@ -92,18 +91,22 @@
 				->setCellValue('A'.($index), $rows[$i]["name"])
 				->setCellValue('B'.($index), $rows[$i]["email"])
 				->setCellValue('C'.($index), $rows[$i]["enddate"])
-				->setCellValue('D'.($index), $rows[$i]["notif"]);
-			$last_used_col="D";
-			foreach ($rows[$i]["popis"] as $popis_i => $popis_v) {
-			$objPHPExcel->getActiveSheet()
-				->setCellValue(++$last_used_col.($index), $popis_v)
-				->setCellValue(++$last_used_col.($index), $rows[$i]["cena"][$popis_i])
-				;
-			}
+				->setCellValue('D'.($index), $rows[$i]["notif"])
+				->setCellValue('E'.($index), $rows[$i]["popis"]);
+
 			// OdstráŇ zvyšné stĺpce ak je viac položiek
 			if($topCol>$last_used_col)
 				$this->delCols($objPHPExcel,$last_used_col,$topCol,$index);
+			
+			//uprav záznam v DB
+			$rowID=$this->dbCtrl->getID("dataview","nazov= ".$fileName."and rowNO = ".$index);
+			$colsArray=array();
+			$valArray=array();
+			$this->dbCtrl->update("riadky",$colsArray,$valArray,"ID=".$rowID);
 		}
+			//uprav záznam investorov
+		
+
 					
 		$this->saveXLSX($objPHPExcel, $res,$fileName);
 		return true;
@@ -118,13 +121,37 @@
 				->setCellValue('A'.($newI[$key]), $row["name"])
 				->setCellValue('B'.($newI[$key]), $row["email"])
 				->setCellValue('C'.($newI[$key]), $row["enddate"])
-				->setCellValue('D'.($newI[$key]), $row["notif"]);
-			$last_used_col="D";
-			foreach ($row["popis"] as $popis_i => $popis_v) {
-			$objPHPExcel->getActiveSheet()
-				->setCellValue(++$last_used_col.($newI[$key]), $popis_v)
-				->setCellValue(++$last_used_col.($newI[$key]), $row["cena"][$popis_i])
-				;
+				->setCellValue('D'.($newI[$key]), $row["notif"])
+				->setCellValue('E'.($newI[$key]), $row["popis"]);
+			
+			//vlož záznam o riadku
+			$fileID=$this->dbCtrl->getID("subory","nazov= ".$fileName);
+			$colsArray=array(
+				"rowNO", 
+				"subor_fk", 
+				"poznamka",
+				"obsah",
+				"downloaded",
+				"archived", 
+				"expirKnow",
+				"expDate"
+			);
+			$valArray=array(
+				$newI[$key], 
+				$fileID,
+				$row["notif"],
+				$row["popis"],
+				0,
+				0,
+				0,
+				$row["enddate"]
+			);
+			//Zisti, či existujú investori a zapamätaj si ich mená
+			$rowID=$this->dbCtrl->getID("dataview","nazov= ".$fileName."and rowNO = ".$newI[$key]);
+			foreach ($row["name"] as $name) {
+				if(!$invID=$this->dbCtrl->getID("investori","meno= ".$row["name"]."and email= ".$row["email"]))
+					$invID=$this->dbCtrl->insert("investori",array("meno", "email"),array($row["name"], $row["email"]));
+				$this->dbCtrl->insert("inv_midd",array("riadok_fk", "investor_fk"),array($rowID, $invID));
 			}
 		}
 		$this->saveXLSX($objPHPExcel, $res,$fileName);
@@ -154,10 +181,11 @@
 				Počiatočná kontrola konf. súborov
 			***************************************/
 			
-			$xlsxsStack = $this->XLSXSFirstData($fileAdr);
+			$xlsxsStack = $this->dbCtrl->getFullData($tempFileAdr);
 			/***************************************
 				Prechádzanie každým riadkom
 			***************************************/
+			
 			foreach ($xlsxsStack as $rowID => $row) {
 				if($row["empty"]==0)
 					array_push($possIndexes, $rowID+1);
@@ -215,9 +243,9 @@
 			/*************************************
 				Kontrola a vytvorenie priečinkovej štruktúry + DB
 			*************************************/
-			if($folderXLSXS=="xlsxs")
+			/*if($folderXLSXS=="xlsxs")
 				if(!$this->OtherModel->firstConfXlsx($tempFileAdr,$adr,sizeof($xlsxsStack),$possIndexes,$this->dbCtrl)) return false;
- 				
+ 			*/	
 
 				$xlsxData[$index]["fileAdr"] =$fileAdr;
 				$xlsxData[$index]["fileName"] =$tempFileAdr;
@@ -226,14 +254,18 @@
 				$xlsxData[$index]["fileData"][$rowID]["archived"] = ($areaConfFile->archived==1)?1:0;
 				$xlsxData[$index]["fileData"][$rowID]["expirKnow"] = ($areaConfFile->expirKnow==1)?1:0;
 				$xlsxData[$index]["fileData"][$rowID]["expir"] = ($areaConfFile->expired==1)?1:0;
-				$xlsxData[$index]["fileData"][$rowID]["name"]     =$row["name"];
-				$xlsxData[$index]["fileData"][$rowID]["email"]    =$row["email"];
+				/********************************
+					Toto prispôsob podľa vlastných potrieb
+				********************************/
+				foreach ($row["name"] as $key => $value) {
+				$xlsxData[$index]["fileData"][$rowID]["name"]     .=$row["name"][$key]."<br>";
+				$xlsxData[$index]["fileData"][$rowID]["email"]    .=$row["email"][$key]."<br>";
+				}
 				$xlsxData[$index]["fileData"][$rowID]["notif"]    =$row["notif"];
 				$xlsxData[$index]["fileData"][$rowID]["enddate"]  =date("d.m.Y",strtotime($row["endDate"]));
 				$xlsxData[$index]["fileData"][$rowID]["dateDiff"]  =$dateDiff;
 				
 	 			$xlsxData[$index]["fileData"][$rowID]["popis"]=$row["popis"];
-	 			$xlsxData[$index]["fileData"][$rowID]["cena"]=$row["cena"];
 	 		if ($podm != "noAccFiles")
 	 		// Neoverené platby od investora
 	 			if (sizeof($paymentArr)>1)

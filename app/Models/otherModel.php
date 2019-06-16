@@ -137,12 +137,32 @@ class OtherModel{
             Vytvorenie priečinkov na súbory
         **************************************/
         if (empty(glob($resFolder.'/neov_platby/'.$name)))
+            /*****************************
+                    Vytvorí priečinok súboru
+                ***************************/
             if(!mkdir($resFolder."/neov_platby/".$name)) return false;
-            if(!mkdir($resFolder."/neov_platby/".$name)) return false;
+             /*****************************
+                    Záznam do DB o súbore
+                ***************************/
+            if(!$this->dbCtrl->insert("subory","nazov",array($name))) return false;
         for ($i=1; $i <= $max; $i++){
             if (!in_array($i, $indexes)) continue;
+            
             if (empty(glob($resFolder."/neov_platby/".$name."/".$i))){
+                /*****************************
+                    Vytvorí priečinok každého riadku
+                ***************************/
                 if(!mkdir($resFolder."/neov_platby/".$name."/".$i))return false;
+                /*****************************
+                    Záznam do DB o investoroch
+                ***************************/
+                if(!$investorID=$this->dbCtrl->getID("investori","meno=".$name."and email="))
+                if(!$fileID=$this->dbCtrl->insert("riadky","$cols",$values))return false;    
+                /*****************************
+                    Záznam do DB o riadkoch
+                ***************************/
+                if(!$fileID=$this->dbCtrl->getID("subory","nazov=".$name))return false;
+                if(!$fileID=$this->dbCtrl->insert("riadky","$cols",$values))return false;
                 if (!$this->createUploadXML(1,$resFolder."/neov_platby/".$name."/".$i."/downloadedFiles.xml"))
                         return false;       
             }
