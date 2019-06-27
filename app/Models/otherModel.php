@@ -80,14 +80,6 @@ class OtherModel{
 
             return($dom->save($adr))?1:0;//'downloadedFiles.xml' 
     }
-    public function sendOwnMail($res,$myMail,$hisMail,$subject,$nadpis,$ownText){
-        include_once $res.'/mail/_top.php';
-        include_once $res.'/mail/alertMail.php';
-        include_once $res.'/mail/_bottom.php';
-        if(mail($hisMail, $subject,$message ,$headers))
-            return 1;
-        else return false;
-    }
     
     public function drawBasicPage($view,$response,$data,$midPage ){
         $phtmlRoutes=array("inc/_top.phtml",$midPage,'inc/_bottom.phtml');
@@ -132,40 +124,78 @@ class OtherModel{
             }
         }
     }
-    public function firstConfXlsx($name,$resFolder,$max,$indexes,$dbCtrl){
+    public function primaryConfXlsx($name,$resFolder,$dbCtrl,$max){
         /**************************************
             Vytvorenie priečinkov na súbory
         **************************************/
-        if (empty(glob($resFolder.'/neov_platby/'.$name)))
-            /*****************************
-                    Vytvorí priečinok súboru
-                ***************************/
             if(!mkdir($resFolder."/neov_platby/".$name)) return false;
              /*****************************
                     Záznam do DB o súbore
                 ***************************/
-            if(!$this->dbCtrl->insert("subory","nazov",array($name))) return false;
+            if(!$fileID=$dbCtrl->insert("subory","nazov",array($name))) return false;
+                      
+        for ($i=1; $i <= $max; $i++){
+            if (empty(glob($resFolder."/neov_platby/".$name."/".$i)))
+                if(!mkdir($resFolder."/neov_platby/".$name."/".$i))return false; 
+        }
+        return $fileID;
+    }
+    public function getmailData($res,$mailFile,$row=NULL,$data=NULL)
+    {
+
+        /******************************
+            Zadefinovanie parametrov nevyčitateľných z riadka
+        *******************************/
+        $oslovenie=($data["oslovenie"])?$data["oslovenie"]:NULL;
+        $link=($data["link"])?$data["link"]:NULL;
+        $nadpis=($data["nadpis"])?$data["nadpis"]:NULL;
+        $ownText=($data["content"])?$data["content"]:NULL;
+           
+        /******************************
+            Maxiálna veľkosť vyšlého poľa
+        *******************************/
+           $maxNO=(($row)?sizeof($row["nameArr"]):1);
+
+        /******************************
+            Cyklus s uložením textu mailu do poľa kvôli viacerým investorom
+        *******************************/
+
+            ob_start(); 
+            include $res.'/mail/_top.php';
+            $topEmail = ob_get_contents(); 
+            ob_end_clean();
+
+            ob_start(); 
+            include $res.'/mail/_bottom.php';
+            $bottomEmail = ob_get_contents(); 
+            ob_end_clean();
+        
+        $index=0;
+        do{
+            $ob[$index]  = $topEmail;
+
+            ob_start(); 
+            include $res.'/mail/'.$mailFile.'.php';
+            $ob[$index] .= ob_get_contents(); 
+            ob_end_clean();
+            
+            $ob[$index] .= $bottomEmail; 
+            $index++;
+          } 
+          while ($index < $maxNO);
+
+        return $ob;
+    } 
+
+    public function secondaryConfXlsx($name,$resFolder,$max,$indexes){
+            /*****************************
+                Priečinková Štruktúra riadkov
+            ***************************/
         for ($i=1; $i <= $max; $i++){
             if (!in_array($i, $indexes)) continue;
-            
-            if (empty(glob($resFolder."/neov_platby/".$name."/".$i))){
-                /*****************************
-                    Vytvorí priečinok každého riadku
-                ***************************/
+            if (empty(glob($resFolder."/neov_platby/".$name."/".$i)))
                 if(!mkdir($resFolder."/neov_platby/".$name."/".$i))return false;
-                /*****************************
-                    Záznam do DB o investoroch
-                ***************************/
-                if(!$investorID=$this->dbCtrl->getID("investori","meno=".$name."and email="))
-                if(!$fileID=$this->dbCtrl->insert("riadky","$cols",$values))return false;    
-                /*****************************
-                    Záznam do DB o riadkoch
-                ***************************/
-                if(!$fileID=$this->dbCtrl->getID("subory","nazov=".$name))return false;
-                if(!$fileID=$this->dbCtrl->insert("riadky","$cols",$values))return false;
-                if (!$this->createUploadXML(1,$resFolder."/neov_platby/".$name."/".$i."/downloadedFiles.xml"))
-                        return false;       
-            }
+            
         }
         return 1;
     }
@@ -176,7 +206,7 @@ class OtherModel{
         $endDate=$explodedDate[1].".".$explodedDate[0].".".$explodedDate[2];
         return (($enddate-$today)/60/60/24);
     }
-    public function downloadZIP($name,$area,$resFolder,$fileNO=NULL){
+    public function downloadZIP($name,$area,$resFolder,$dbCtrl,$fileNO=NULL){
     ob_start();
     $filename= preg_replace('/[\x00-\x1F\x7F-\xFF]/', '', $name);
     $xlsxAdr=glob($resFolder."/xlsxs/".$name.".xlsx");
@@ -189,7 +219,7 @@ class OtherModel{
         
         foreach ($files as $key => $value) {    
             
-            if (basename($value)=="downloadedFiles.xml") continue;
+            //if (basename($value)=="downloadedFiles.xml") continue;
             if (!empty($fileNO)&&$fileNO!=$key) continue;
 
             $z->addFile($value,basename($value));                
@@ -197,8 +227,10 @@ class OtherModel{
 
         $filename = $z->filename;
         $z->close();
+        //zmena konf. dát riadka
+    $rowID=$dbCtrl->getID("dataview","nazov=".$name." and rowNO = ".$area);
+    $dbCtrl->update("riadky",array("downloaded"),array(1),"ID=".$rowID);
 
-    $this->createUploadXML(0, $resFolder."/neov_platby/".$name."/".$area."/downloadedFiles.xml","down",1);
     $finfo = finfo_open(FILEINFO_MIME_TYPE);
     $mimeType = finfo_file($finfo, $filename);
     $size = filesize($filename);

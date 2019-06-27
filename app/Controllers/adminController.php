@@ -33,7 +33,7 @@
     	function XLSXSFirstData($fileAdr){
 
     		$excelObj=$this->readXLSX($fileAdr);
-    		
+
 			$getSheet=$excelObj->getActiveSheet()->toArray(NULL);
 			foreach ($getSheet as $rowID => $row) {
 				//Ak je, v tomto prípade 0. prvok, NULL - riadok neexistuje 
@@ -45,9 +45,10 @@
 				$array[$rowID]["name"]=explode("<br />", nl2br($row[0]));
 				$array[$rowID]["email"]=explode("<br />", nl2br($row[1]));
 				$array[$rowID]["notif"]=nl2br($row[3]);
-				$array[$rowID]["endDate"]=$explodedDate[1].".".$explodedDate[0].".".$explodedDate[2];	
+				$array[$rowID]["endDate"]=$explodedDate[1].".".$explodedDate[0].".".$explodedDate[2];
+
 				$popis_i=0;
-				$array[$rowID]["content"] = nl2br($row[4]);;
+				$array[$rowID]["content"] = nl2br($row[4]);
 			}
 			return $array;
     	}
@@ -67,7 +68,6 @@
 
     }
 	public function delXLSXRow($res,$fileName, $iArray){
-
 		$objPHPExcel = $this->readXLSX($res."/xlsxs/".$fileName.".xlsx");
 		$topCol=$objPHPExcel->setActiveSheetIndex(0)->getHighestColumn();
 		foreach ($iArray as $i => $index) {
@@ -76,7 +76,7 @@
 			// Potom odstráň konfig. súbory
 			$this->delete($res."/neov_platby/".$fileName."/".$index);
 			// Odstránenie z DB
-			$rowID=$this->dbCtrl->getID("dataview","nazov= ".$fileName."and rowNO = ".$index);
+			$rowID=$this->dbCtrl->getID("dataview","nazov= ".$fileName." and rowNO = ".$index);
 			$this->dbCtrl->delete("riadky","ID=".$rowID);
 		}
 		$this->saveXLSX($objPHPExcel, $res,$fileName);
@@ -99,11 +99,32 @@
 				$this->delCols($objPHPExcel,$last_used_col,$topCol,$index);
 			
 			//uprav záznam v DB
-			$rowID=$this->dbCtrl->getID("dataview","nazov= ".$fileName."and rowNO = ".$index);
-			$colsArray=array();
-			$valArray=array();
+			$rowID=$this->dbCtrl->getID("dataview","nazov=".$fileName." and rowNO = ".$index);
+			
+			//uprav priradenie investorov
+			array_push($invArr,$this->dbCtrl->select("inv_midd","investor_fk","investori.meno=".$rows[$i]["name"],"investori on investori.ID=inv_midd.investor_fk"));
+			if (!in_array($rows[$i]["name"], $invArr)) {
+				
+
+				//Premeň investorov, ktorí sú zamenení
+			//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SDasdsa!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+			}
+			//nahraj nové data riadkov
 			$this->dbCtrl->update("riadky",$colsArray,$valArray,"ID=".$rowID);
-		}
+			}
+			$colsArray=array(  
+				"poznamka",
+				"obsah",
+				"expDate"
+			);
+			$valArray=array(
+				$row["notif"],
+				$row["popis"],
+				$row["enddate"]
+			);
+			$this->dbCtrl->update("riadky",$colsArray,$valArray,"ID=".$rowID);
+		//}
 			//uprav záznam investorov
 		
 
@@ -114,7 +135,7 @@
     public function addXLSXRow($res,$fileName,$newData,$oldSize,$newI){
 
 		$objPHPExcel = $this->readXLSX($res."/xlsxs/".$fileName.".xlsx");
-		if(!$this->OtherModel->firstConfXlsx($fileName,$res,sizeof($newData)+$oldSize,$newI,$this->dbCtrl)) return false;
+		if(!$this->OtherModel->secondaryConfXlsx($fileName,$res,sizeof($newData)+$oldSize,$newI)) return false;
 		// Add column headers
 		foreach ($newData as $key => $row) {
 			$objPHPExcel->getActiveSheet()
@@ -126,16 +147,22 @@
 			
 			//vlož záznam o riadku
 			$fileID=$this->dbCtrl->getID("subory","nazov= ".$fileName);
-			$colsArray=array(
-				"rowNO", 
-				"subor_fk", 
-				"poznamka",
-				"obsah",
-				"downloaded",
-				"archived", 
-				"expirKnow",
-				"expDate"
-			);
+			//Zisti, či existujú investori a zapamätaj si ich mená
+			$rowID=$this->dbCtrl->getID("dataview","nazov=".$fileName." and rowNO = ".$newI[$key]);
+			foreach ($row["name"] as $name) {
+				if(!$invID=$this->dbCtrl->getID("investori","meno= ".$row["name"]." and email= ".$row["email"]))
+					$invID=$this->dbCtrl->insert("investori","meno, email",array($row["name"], $row["email"]));
+				$this->dbCtrl->insert("inv_midd","riadok_fk, investor_fk",array($rowID, $invID));
+			}
+			$colsArray=
+				"rowNO, 
+				subor_fk, 
+				poznamka,
+				obsah,
+				downloaded,
+				archived, 
+				expirKnow,
+				expDate";
 			$valArray=array(
 				$newI[$key], 
 				$fileID,
@@ -146,13 +173,12 @@
 				0,
 				$row["enddate"]
 			);
-			//Zisti, či existujú investori a zapamätaj si ich mená
-			$rowID=$this->dbCtrl->getID("dataview","nazov= ".$fileName."and rowNO = ".$newI[$key]);
-			foreach ($row["name"] as $name) {
-				if(!$invID=$this->dbCtrl->getID("investori","meno= ".$row["name"]."and email= ".$row["email"]))
-					$invID=$this->dbCtrl->insert("investori",array("meno", "email"),array($row["name"], $row["email"]));
-				$this->dbCtrl->insert("inv_midd",array("riadok_fk", "investor_fk"),array($rowID, $invID));
-			}
+
+			/*****************************
+                Záznam do DB o riadkoch
+        	***************************/
+                if(!$fileID=$this->dbCtrl->insert("riadky",$colsArray,$valArray))return false; 
+
 		}
 		$this->saveXLSX($objPHPExcel, $res,$fileName);
 		return true;
@@ -162,53 +188,48 @@
 		$objWriter->save($res."/xlsxs/".$fileName.".xlsx");
     }
 
- 	function loadXLSXs($adr, $folderXLSXS,$folderPays, $podm=NULL,$possName=NULL){
- 		$xlsxData=$possIndexes=array();
- 		$index=0;
-	 	$fileArr=glob($adr."/".$folderXLSXS."/*.xlsx");
-		foreach ($fileArr as $fileAdr) {
-			/***************************************
-				Prechádzanie každým súborom
-			***************************************/
-			$tempFileAdr=explode(".xlsx",basename($fileAdr))[0];
-			/******************************************************************************
-				Kontrola určitého názvu súboru ( aby nemusel prehľadávať všetky súbory )
-			******************************************************************************/
-			if ($possName!=NULL&&($tempFileAdr!=$possName)) {
-				continue;
-			}
-			/***************************************
-				Počiatočná kontrola konf. súborov
-			***************************************/
+ 	function loadXLSXs($adr, $folderXLSXS, $podm=NULL,$possName=NULL,$searchString = NULL){
+ 		$xlsxData=array();
 			
-			$xlsxsStack = $this->dbCtrl->getFullData($tempFileAdr);
+			/***************************************
+				Počiatočné načítanie dát
+			***************************************/
+			$xlsxsStack = (!empty($possName))?
+					((!empty($searchString))?
+					$this->dbCtrl->getFullData($possName,$searchString):
+					$this->dbCtrl->getFullData($possName)
+				):
+				((!empty($searchString))?
+					$this->dbCtrl->getFullData(NULL,$searchString):
+					$this->dbCtrl->getFullData()
+				);
+			
 			/***************************************
 				Prechádzanie každým riadkom
 			***************************************/
-			
 			foreach ($xlsxsStack as $rowID => $row) {
-				if($row["empty"]==0)
-					array_push($possIndexes, $rowID+1);
-				else{	
-					$xlsxData[$index]["fileData"][$rowID]["empty"]=1;
+
+				$dateDiff=$this->OtherModel->dateDiff($row["enddate"]);
+
+			 	//odstráň súbor (+riadky) a pokračuj, ak neexistuje xlsx súbor)
+			 	/*if(empty(glob($adr."/".$folderXLSXS."/".$row["fileName"].".xlsx"))){
+			 		$this->dbCtrl->delete("subory","ID=".$row["subor_fk"]);
+			 		continue;
+			 	}*/ // - blbovzdorné a možno zbytočné 
+
+			 	/******************************************************************************
+					Kontrola určitého názvu súboru
+				******************************************************************************/
+/*				if ($possName!=NULL&&($tempFileAdr!=$possName)) {
 					continue;
 				}
-				
-				$dateDiff=$this->OtherModel->dateDiff($row["endDate"]);
-				$areaConfFile=simplexml_load_string(file_get_contents($adr."/".$folderPays."/".$tempFileAdr."/".($rowID+1)."/downloadedFiles.xml"));
-				$paymentArr=glob($adr."/".$folderPays."/".$tempFileAdr."/".($rowID+1)."/*");
+*/
 					/*******************
 						Podmienky
 					******************/	
-			if ($podm=="init") {
-			}
-				if ($areaConfFile->deleted==1) continue;
-				if($folderXLSXS=="xlsxs")
-					if(($dateDiff<=-90)&&($areaConfFile->archived==0))
-						if($areaConfFile->expired==0)
-							$this->OtherModel->createUploadXML(0, $adr."/neov_platby/".$tempFileAdr."/".($rowID+1)."/downloadedFiles.xml","expired",1);
+
 				if($podm=="home"||$podm=="init"||$podm=="notif1"||$podm=="notif2")
-					if(($areaConfFile->archived==1)||($dateDiff<=-90)||sizeof($paymentArr)>1) continue;
+					if((intval($row["archived"])==1)||($dateDiff<=-90)) continue;
 				
 				if($podm=="init")
 					if (($dateDiff<=-30)||($dateDiff>0)) continue;
@@ -218,64 +239,57 @@
 
 				if($podm=="notif2")
 					if(($dateDiff<=-90)||($dateDiff>-60)) continue;
-				if($podm=="book")
-					if((sizeof($paymentArr)==1)||($areaConfFile->archived==0)) continue;
+				if($podm=="book"){
+					if(intval($row["archived"])==0) continue;
+					$paymentArr=glob($adr."/neov_platby/".$row["nazov"]."/".$row["rowNO"]."/*");
+				}
 				if($podm=="expired")
-					if(($dateDiff>-90)||($areaConfFile->archived==1)) continue;
+					if(($dateDiff>-90)||(intval($row["archived"])==1)) continue;
 				if($podm=="expiredCount")
-					if(($dateDiff>-90)&&($areaConfFile->archived==0)&&($areaConfFile->expired==1)&&($areaConfFile->expirKnow==0)){
+					if(($dateDiff>-90)&&(intval($row["archived"])==0)&&(intval($row["expired"])==1)&&($row["expirKnow"]==0)){
 					$count++;
 					continue;
 				} 
 				if($podm=="newFilesCount")
-					if($areaConfFile->downloaded==0&&$areaConfFile->archived==1){
+					if($row["downloaded"]==0&&intval($row["archived"])==1){
 					$count++;
 					continue;
 				} 		
 				if($row["empty"]==1){	
-				$xlsxData[$index]["fileData"][$rowID]["empty"] =1;
+				$xlsxData[$index][$rowID]["empty"] =1;
 				continue;
 				}
 					/***********************
 						Koniec podmienok
 					***********************/	
-		 		
-			/*************************************
-				Kontrola a vytvorenie priečinkovej štruktúry + DB
-			*************************************/
-			/*if($folderXLSXS=="xlsxs")
-				if(!$this->OtherModel->firstConfXlsx($tempFileAdr,$adr,sizeof($xlsxsStack),$possIndexes,$this->dbCtrl)) return false;
- 			*/	
-
-				$xlsxData[$index]["fileAdr"] =$fileAdr;
-				$xlsxData[$index]["fileName"] =$tempFileAdr;
-				$xlsxData[$index]["fileData"][$rowID]["downloaded"] = ($areaConfFile->downloaded==1)?1:0;
-				$xlsxData[$index]["fileData"][$rowID]["deleted"] = ($areaConfFile->deleted==1)?1:0;
-				$xlsxData[$index]["fileData"][$rowID]["archived"] = ($areaConfFile->archived==1)?1:0;
-				$xlsxData[$index]["fileData"][$rowID]["expirKnow"] = ($areaConfFile->expirKnow==1)?1:0;
-				$xlsxData[$index]["fileData"][$rowID]["expir"] = ($areaConfFile->expired==1)?1:0;
+		 		$index=$row["subor_fk"];
+				
+				$xlsxData[$index][$rowID] =$row;
 				/********************************
 					Toto prispôsob podľa vlastných potrieb
 				********************************/
-				foreach ($row["name"] as $key => $value) {
-				$xlsxData[$index]["fileData"][$rowID]["name"]     .=$row["name"][$key]."<br>";
-				$xlsxData[$index]["fileData"][$rowID]["email"]    .=$row["email"][$key]."<br>";
+				foreach ($row["nameArr"] as $key => $value) {
+				$xlsxData[$index][$rowID]["name"]     .=$row["nameArr"][$key]."<br>";
+				$xlsxData[$index][$rowID]["email"]    .=$row["emailArr"][$key]."<br>";
 				}
-				$xlsxData[$index]["fileData"][$rowID]["notif"]    =$row["notif"];
-				$xlsxData[$index]["fileData"][$rowID]["enddate"]  =date("d.m.Y",strtotime($row["endDate"]));
-				$xlsxData[$index]["fileData"][$rowID]["dateDiff"]  =$dateDiff;
+
+				$xlsxData[$index][$rowID]["dateDiff"]  =$dateDiff;
 				
-	 			$xlsxData[$index]["fileData"][$rowID]["popis"]=$row["popis"];
 	 		if ($podm != "noAccFiles")
 	 		// Neoverené platby od investora
-	 			if (sizeof($paymentArr)>1)
-	 				$xlsxData[$index]["fileData"][$rowID]["paymentFiles"]=$paymentArr;
+	 			if (isset($paymentArr)&&sizeof($paymentArr)>1)
+	 				$xlsxData[$index][$rowID]["paymentFiles"]=$paymentArr;
 			}
-			$index++;
 
- 		}
 			if($podm=="expiredCount"||$podm=="newFilesCount") return $count;
- 		return $xlsxData; 
+				
+				/**************************************
+					Nakoniec treba správne zoradiť indexy
+				****************************************/
+				foreach ($xlsxData as $i => $val) 
+				$final[$i] = array_values($val);
+
+ 		return array_values($final); 
  	}
 
  	function deleteAcc($index,$file){
@@ -340,12 +354,11 @@
  		if(empty($data)) return false;
 	  $rowIndex=0;
 	  			foreach ($data as $key => $dataVal) {
-	  						
-	  				foreach ($dataVal["fileData"] as $rowID => $row) {
+	  				foreach ($dataVal as $rowID => $row) {
 	  					/**********************************
 								Ak je prázdny riadok, odstráň ho.
 	  					**********************************/
-		  				if ($row["empty"]==1) {unset($data[$key]["fileData"][$rowID]); continue;}
+		  				//if ($row["empty"]==1) {unset($data[$key][$rowID]); continue;}
 
 	  					foreach ($row as $colName =>$rowData) $data[$rowIndex][$colName]=$rowData;
 		  				$data[$rowIndex]["notif"]=(!empty($row["notif"]))?$row["notif"]:"Žiadna";
@@ -364,7 +377,7 @@
 						$data[$rowIndex]["modal"] = '<button type="button" class="btn btn-view" data-toggle="modal" data-target="#XLSXModal" onclick="viewXLSXModal('.$key.','.$rowID.')"><i class="fas fa-folder-open"></i></button>';
 						$rowIndex++;
 	  				}
-	  				if (empty($data[$key]["fileData"]))
+	  				if (empty($data[$key]))
 						unset($data[$key]);
 	  			}
 	  			return (empty($data))?false:json_encode($data);

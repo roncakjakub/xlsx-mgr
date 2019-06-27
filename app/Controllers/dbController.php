@@ -73,28 +73,45 @@ class DbController
      * @return array
      */
 	
-		function getFullData($nazov){
+		function getFullData($possName=NULL,$searchString=NULL){
 			$rowID=0;
 		/********************************
 			Zisti pocet prvkov v velues referencii
 		********************************/
-		$dbResult=$this->select("dataview","*","nazov=".$nazov);
+		$where=($possName)?"nazov=".$possName:NULL;
+		$dbResult=$this->select("dataview","*",$where /*Where hocičo je $searchString*/);
+			
 			while ($row=$dbResult->fetch()) {
-			$invArr=$this->select("investori","investori.*","inv_midd.riadok_fk=".$row["rowNO"], "join inv_midd on inv_midd.investor_fk=investori.ID");
-
+			$invArr=$this->select("investori","investori.*","inv_midd.riadok_fk=".$row["ID"], "join inv_midd on inv_midd.investor_fk=investori.ID");
 				//Ak je, v tomto prípade 0. prvok, NULL - riadok neexistuje 
-				$explodedDate=explode("-", $row["expDate"]);
+				$numericRow=array_values($row);
+				list(
+						/*ID*/,
+						$array[$rowID]["rowNO"],
+						$array[$rowID]["subor_fk"],
+						$array[$rowID]["notif"],
+						$array[$rowID]["content"],
+						$array[$rowID]["downloaded"],
+						$array[$rowID]["archived"],
+						$array[$rowID]["expirKnow"],
+						/*enddate*/,
+						$array[$rowID]["nazov"],
+						$array[$rowID]["fileName"],
+				)=$numericRow;
+
 				$array[$rowID]["empty"]=0;
-				$array[$rowID]["name"]=$array[$rowID]["email"]=array();
+				$array[$rowID]["nameArr"]=$array[$rowID]["emailArr"]=array();
 				while ($invRow=$invArr->fetch()) {
-					array_push($array[$rowID]["name"], $invRow["meno"]);
-					array_push($array[$rowID]["email"], $invRow["email"]);
+					array_push($array[$rowID]["nameArr"], $invRow["meno"]);
+					array_push($array[$rowID]["emailArr"], $invRow["email"]);
 				}
-				$array[$rowID]["notif"]=$row["poznamka"];
-				$array[$rowID]["endDate"]=$explodedDate[2].".".$explodedDate[1].".".$explodedDate[0];	
-				$array[$rowID]["content"] = $row["obsah"];
+
+				$explodedDate=explode("-", $row["expDate"]);
+				$array[$rowID]["enddate"]=$explodedDate[2].".".$explodedDate[1].".".$explodedDate[0];	
+				
 				$rowID++;
  			}
+
 			return $array;
 	}
 

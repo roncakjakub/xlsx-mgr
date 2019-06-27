@@ -4,87 +4,155 @@ $fileArr=glob($this->resources.'/xlsxs/*.xlsx');
 $myMail=$this->LoginController->getEmails()[0];
 $this->AdminController->configuration($this->resources.'/secXML/xlsxConf.xml');
 
-$xlsxStack=$this->AdminController->loadXLSXs($this->resources, "xlsxs", "neov_platby");
-foreach ($xlsxStack as $xlsxData) {
-	$modifyTime=filectime($xlsxData["fileAdr"]);
-	$fileName=$xlsxData["fileName"];
-	foreach ($xlsxData["fileData"] as $rowID => $row) {
-		if ($row["deleted"]==1||$row["archived"]==1||$row["expired"]==1) continue;
-	$oslovenie="Dobrý deň p. ".$row["name"].",";
-	$email=$row["email"];
-	$endDatediff=$this->OtherModel->dateDiff($row["enddate"]);//skontroluj dátumy
-		$message="";
-		/***********************************
-		Pokiaľ je do skončenia faktúry 1 mesiac alebo menej, odošli 1. email
-	**********************************/
-	if ($endDatediff==30) {
-		$popis = $row["popis"];
-		$cena = $row["cena"];
-		/*********************************************
-			Priradenie kľúčov (názvov) a hodnôt (cien) do poľa popisov
-		*********************************************/
+	/*****************************
+		Vloženie dát nových záznamov do DB + priečinková štruktúra
+	*****************************/
 
-		$link=$this->OtherModel->toASCII($fileName)."&area=".($rowID+1)."&email=".$email;
+	foreach ($fileArr as $key => $file) {
+		$fileName=explode(".", basename($file))[0];
+		if(!glob($this->resources.'/neov_platby/'.$fileName)){	
+			$newXlsxData=$this->AdminController->XLSXSFirstData($file);
+			
+		
+			$rowCounter=0;
+			foreach ($newXlsxData as $rowData)
+				if ($rowData["empty"]!=1) $rowCounter++;
+					
+			$fileID=$this->OtherModel->primaryConfXlsx($fileName,$this->resources,$this->DbController,$rowCounter);
+				
+			$rowCounter=0;
+			foreach ($newXlsxData as $rowData){
+				if ($rowData["empty"]==1) continue;
+			
+			$rowCounter++;
+			$colsArray="rowNO,subor_fk,poznamka,obsah,downloaded,archived, expirKnow,expDate";
+
+			/*****************************
+				Prevod dátumu do správneho formátu
+			*****************************/
+			$workDate=explode(".", $rowData["endDate"]);
+			$finalDate = $workDate[2]."-".$workDate[1]."-".$workDate[0];
+
+			$valArray=array(
+				$rowCounter, 
+				$fileID,
+				$rowData["notif"],
+				$rowData["content"],
+				0,
+				0,
+				0,
+				$finalDate
+				//skontroluj
+			);
+			/*****************************
+                Záznam do DB o riadkoch
+        	***************************/
+
+                $rowID=$this->DbController->insert("riadky",$colsArray,$valArray);
+				foreach ($rowData["name"] as $nameI => $name) {
+					/*************************************
+						Pokiaľ nieje daný investor nahraný pridaj ho do DB a ku záznamu
+					**************************************/
+					if(!$invID=$this->DbController->getID("investori","meno= '".$name."' and email= '".$rowData["email"][$nameI]."'")){	
+						$invID=$this->DbController->insert("investori","meno, email",array($name, $rowData["email"][$nameI]));
+						$this->DbController->insert("inv_midd","riadok_fk, investor_fk",array($rowID, $invID));
+					}
+					else{
+					if($this->DbController->getID("inv_midd","riadok_fk= '".$rowCounter."' and investor_fk= '".$invID."'")){	
+						//die();
+						
+					}
+				}
+			}
+
+		}
+	}
+}
+	/******************************
+		Čítanie z DB
+	*****************************/
+$xlsxStack=$this->AdminController->loadXLSXs($this->resources, "xlsxs");
+foreach ($xlsxStack as $xlsxData) {
+	foreach ($xlsxData as $rowID => $row) {
+		if ($row["deleted"]==1||$row["archived"]==1||$row["expired"]==1) continue;
+	
+	$endDatediff=$this->OtherModel->dateDiff($row["enddate"]);//skontroluj dátumy
+	$headers = EMAIL_HEADERS. 'From: <'.$myMail.'>' . "\r\n";
+
+		/***********************************
+			Pokiaľ je do skončenia faktúry 1 mesiac odošli 1. email
+		**********************************/
+	if (/*$endDatediff==30||*/1) {
+
+		$emailData["nadpis"] = "Inicializácia objednávky";
+		$message=$this->OtherModel->getmailData($this->resources,"first",$row,$emailData);
 		$subject = "Vaša objednávka bola inicializovaná";
-		$nadpis = "Inicializácia objednávky";
-		include $this->resources.'/mail/_top.php';
-		include $this->resources.'/mail/first.php';
-		include $this->resources.'/mail/_bottom.php';
-		mail($email,$subject,$message,$headers);
+		
+		/*************************************************
+			Odošle email všetkým investorom daného záznamu
+		**************************************************/
+
+		foreach ($row["emailArr"] as $emailIndex => $email){	
+			$emailData["link"]=$this->OtherModel->toASCII($fileName)."&area=".($rowID+1)."&email=".$email;
+			var_dump($emailData["link"]);die;
+			
+			mail($email,$subject,$message[$emailIndex],$headers);
+		}
+	
+	die();
+	
 	}else{
 		/***********************************
 			Pokiaľ je v druhom dátume, odošli 2. email o expirácií
 		**********************************/
 		if ($endDatediff==0) {
-			$ownText = "Dnešným dňom Vám expiruje faktúra. Prosíme o skoré odoslanie potvrdenia platby. Ďakujeme.";
-				$nadpis = $subject= "1. Upozornenie";
+			$emailData["content"] = "Dnešným dňom Vám expiruje faktúra. Prosíme o skoré odoslanie potvrdenia platby. Ďakujeme.";
+			$emailData["nadpis"] = $subject= "1. Upozornenie";
 		}else
 		/***********************************
 			1 mesiac po expirácií
 		**********************************/
 		if ($endDatediff==-30) {
-			$ownText = "2. upozornenie o neúhrade faktúry. Prosíme o skoré odoslanie potvrdenia platby. Ďakujeme.";
-			$nadpis = $subject= "2. Upozornenie";
+			$emailData["content"] = "2. upozornenie o neúhrade faktúry. Prosíme o skoré odoslanie potvrdenia platby. Ďakujeme.";
+			$emailData["nadpis"] = $subject= "2. Upozornenie";
 		}else
 		/***********************************
 			2 mesiace po expirácií
 		**********************************/
 		if ($endDatediff==-60) {
-			$ownText = "3. upozornenie o neúhrade faktúry. Prosíme o skoré odoslanie potvrdenia platby. Ďakujeme.";
-			$nadpis = $subject= "3. Upozornenie";
+			$emailData["content"] = "3. upozornenie o neúhrade faktúry. Prosíme o skoré odoslanie potvrdenia platby. Ďakujeme.";
+			$emailData["nadpis"] = $subject= "3. Upozornenie";
 		}else
 		/***********************************
 			3 mesiac po expirácií
 		**********************************/
 		if ($endDatediff==-90) {
-			$message="";
-			$subject = "Expirovaná faktúra";
-			$ownText = "Platnosť faktúry na meno ".$row["name"]." dnes skončila.";
-			$nadpis = "Expirovaná faktúra";
-			$oslovenie="Vážený administrátor,";
-			$myMail = "probim@probim.sk";
-			include $this->resources.'/mail/_top.php';
-			include $this->resources.'/mail/expirMail.php';
-			include $this->resources.'/mail/_bottom.php';
+			$emailData["content"] = "Platnosť faktúry na meno ".$row["name"]." dnes skončila.";
+			$emailData["nadpis"] = $subject = "Expirovaná faktúra";
+			$emailData["oslovenie"]="Vážený administrátor,";
+			$message=$this->OtherModel->getmailData($this->resources,"expirMail",$row,$emailData);
+			$headers = EMAIL_HEADERS. 'From: <"probim@probim.sk">' . "\r\n";
+		
 			$allEmails = $this->LoginController->getEmails();
 			foreach ($allEmails as $email) 
-			mail($email,$subject,$message,$headers);
-		
-		/************************************************
-			Kontrola oblastí pre prípadný presun súboru
-		************************************************/
+			mail($email,$subject,$message,$headers);		
 			
-			$ownText = "Dnešným dňom Vám ubehli 3 mesiace expiračnej lehoty k zaplateniu faktúry. Do niekoľkých dní Vás bude kontaktovať administrátor.";
-			$nadpis = $subject= "3. Upozornenie";
+			$emailData["content"] = "Dnešným dňom Vám ubehli 3 mesiace expiračnej lehoty k zaplateniu faktúry. Do niekoľkých dní Vás bude kontaktovať administrátor.";
+			$emailData["nadpis"] = $subject= "3. Upozornenie";
 			//$this->OtherModel->lastsFileCheck($fileName,$this->resources);
-			$this->OtherModel->createUploadXML(0, $this->resources."/neov_platby/".$fileName."/".($rowID+1)."/downloadedFiles.xml","expired",1);
+    		$rowID=$this->DbController->getID("dataview","nazov=".$nazov."and rowNO = ".$area);
+    		$this->DbController->update("riadky",array("expired"),array(1),"ID=".$rowID);
+			
 		}
 		else continue;
 
-		include $this->resources.'/mail/_top.php';
-		include $this->resources.'/mail/expirMail.php';
-		include $this->resources.'/mail/_bottom.php';
-		mail($email,$subject,$message,$headers);
+		/*************************************************
+			Odošle email všetkým investorom daného záznamu
+		**************************************************/
+
+		$message=$this->OtherModel->getmailData($this->resources,"expirMail",$row,$emailData);
+		foreach ($row["emailArr"] as $emailIndex => $email)
+			mail($email,$subject,$message[$emailIndex],$headers);
 		}
 	}
 }

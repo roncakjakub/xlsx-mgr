@@ -1,5 +1,4 @@
-<?php 
-$message .= '
+
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -227,12 +226,14 @@ $message .= '
                 </tr></tbody></table>
 
                 <div class="banner" style="margin: 0 auto;padding: 30px;font-family: &quot;Century Gothic&quot;;background-color: #363636;text-align: center;color: white;">
-                    <h1 class="h1" style="margin: 5px 0;padding: 0;font-family: &quot;Century Gothic&quot;;color: #fff;font-weight: bold">'.$nadpis.'</h1>
+                    <h1 class="h1" style="margin: 5px 0;padding: 0;font-family: &quot;Century Gothic&quot;;color: #fff;font-weight: bold"><?php echo $nadpis ?></h1>
                     <hr class="hr_my" style="margin: 10px auto;padding: 0;font-family: &quot;Century Gothic&quot;;width: 30%;">
                     <p class="p" style="width: 40%;margin: 0 auto;color:#bdbdbd;padding: 0;font-family: &quot;Century Gothic&quot;;font-size: .8rem">Tento e-mail je automaticky generovaný spoločnosťou ProBim s.r.o </p>
                 </div>
                 <div class="text" style="margin: 0 auto;padding: 50px 0;font-family: &quot;Century Gothic&quot;;background-color: white;">
-                    <p style="margin: 0 auto;padding: 0;font-family: &quot;Calibri&quot;;width: 70%;text-align: justify;font-size: 1.15rem">'.$oslovenie.'</p>
+                    <p style="margin: 0 auto;padding: 0;font-family: &quot;Calibri&quot;;width: 70%;text-align: justify;font-size: 1.15rem">
+
+                        <?php echo $oslovenie ?>
+
+                        </p>
                     <br style="margin: 0 auto;padding: 0;font-family: &quot;Century Gothic&quot;;">
-';
-?>

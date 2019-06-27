@@ -1,4 +1,4 @@
-<?php  $message.='<div class="w-70 sign" style="width: 70%;padding-top: 2rem;margin: 0 auto;">
+<div class="w-70 sign" style="width: 70%;padding-top: 2rem;margin: 0 auto;">
                         <div class="m-l-0 d-in-block pozdrav" style="margin-right:auto;padding: 0;margin-left: 0;">
                             <p class="m-l-0" style="margin: 0 auto;padding: 0;font-family: &quot;Calibri&quot;;font-size:.95rem;margin-left: 0;width: 70%;text-align: justify;">S pozdravom</p>
                             <p class="m-l-0" style="margin: 0 auto;padding: 0;font-family: &quot;Calibri&quot;;font-size:.95rem;margin-left: 0;width: 70%;text-align: justify;">Pavol Ladňák</p>
@@ -58,13 +58,3 @@
         </div>
     </body>
 </html>
-';
-
-// Always set content-type when sending HTML email
-$headers = "MIME-Version: 1.0" . "\r\n";
-$headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
-// More headers
-
-$headers .= 'From: <'.$myMail.'>' . "\r\n";
-
-?>

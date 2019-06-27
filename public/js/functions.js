@@ -1,18 +1,16 @@
-function ukazAlbum(el){
-var albumID = $(el).data( "id" );
-var request = $.ajax({
-  url: "../gallery/album.php",
+function ajaxSearch(el,url){
+  var string = el.value;
+  var request = $.ajax({
+  url: url+"/search",
   method: "POST",
-  data: { ID : albumID },
+  data: { string: string },
   dataType: "html"
 });
  
 request.done(function( msg ) {
- var heading =  $($.parseHTML(msg)).filter("#heading").text(); 
- $("#exampleModalLabel").text(heading);
- var body=($($.parseHTML(msg)).filter("main"));
- $("#modal-body").html(body);
-});
+ var body=($($.parseHTML(msg)));
+ $("#searchAnswer").html(body);
+});  
 }
 
 function uploadFileName(el){
@@ -116,13 +114,13 @@ function regformhash(form, email, password, conf) {
 }
 
 function ajaxPreview(poradie,area) {
-var oslovenie=poleJSON[poradie]["fileData"][area].name;
+var oslovenie=poleJSON[poradie][area].nameArr[0];
 var nazov=poleJSON[poradie].fileName;
-var popis=poleJSON[poradie]["fileData"][area].popis;
-var cena=poleJSON[poradie]["fileData"][area].cena;
+var content=poleJSON[poradie][area].content;
+var cena=poleJSON[poradie][area].cena;
  var request = $.ajax({
   url: "/public/ajax/previewMail.php",
-  data: {nazov: nazov,oslovenie: oslovenie,popis: popis,cena:cena},
+  data: {nazov: nazov,oslovenie: oslovenie,content: content},
   method: "POST",
   dataType: "html"
 });
@@ -134,12 +132,11 @@ request.done(function( msg ) {
 } 
 
 function ajaxInvestFiles(poradie,area, permitAble) {
-var subory=poleJSON[poradie]["fileData"][area].paymentFiles;
-var nazov=poleJSON[poradie].fileName;
-var xlsxs=poleJSON[poradie].fileAdr;
+var subory=poleJSON[poradie][area].paymentFiles;
+var nazov=poleJSON[poradie][area].nazov;
  var request = $.ajax({
   url: "/public/ajax/investFiles.php",
-  data: {subory:subory, nazov: nazov,xlsxs: xlsxs,area: (area+1),permitAble: permitAble},
+  data: {subory:subory, nazov: nazov,area: (area+1),permitAble: permitAble},
   method: "POST",
   dataType: "html"
 });
@@ -155,21 +152,20 @@ var modal=$("#XLSXModal");
           /***********************************
               Deklarovanie
           **********************************/
-var nazov=poleJSON[poradie].fileName;
-var enddate=poleJSON[poradie]["fileData"][area].enddate;
-var email=poleJSON[poradie]["fileData"][area].email;
-var name=poleJSON[poradie]["fileData"][area].name;
-var subory=poleJSON[poradie]["fileData"][area].paymentFiles;
-var notif=poleJSON[poradie]["fileData"][area].notif;
+var nazov=poleJSON[poradie][area].nazov;
+var enddate=poleJSON[poradie][area].enddate;
+var email=poleJSON[poradie][area].email;
+var name=poleJSON[poradie][area].name;
+var subory=poleJSON[poradie][area].paymentFiles;
+var notif=poleJSON[poradie][area].notif;
 var nazvySuborov="",temp;
 if (!subory) nazvySuborov="Zatiaľ žiadne";
 else
 for(var i=0;i<subory.length; i++){
   temp=subory[i].split("/");
-  if (temp[temp.length - 1]!="downloadedFiles.xml")
-  nazvySuborov+="<a href='/download?area="+(area+1)+"&name="+nazov+"&fileNO="+i+"'>"+temp[temp.length - 1]+"</a><br>";
+  nazvySuborov+="<a href='/download?area="+(area+1)+"&name="+nazov+"&fileNO="+(i+1)+"'>"+temp[temp.length - 1]+"</a><br>";
 }
-var dateDiff=poleJSON[poradie]["fileData"][area].dateDiff;
+var dateDiff=poleJSON[poradie][area].dateDiff;
 
 if(dateDiff>30)
   dateDIffStatus="Pred inicializáciou";
@@ -185,10 +181,11 @@ else if(dateDiff<=0)
                   Priredenie
           **********************************/
 $(modal).find(".modal-title").html("<span class='clr-org font-weight-bold'>"+nazov+"</span>");
-$(modal).find("#infoModalDate").text(enddate);
-$(modal).find("#infoModalEmail").text(email);
-$(modal).find("#infoModalName").text(name);
-$(modal).find("#infoModalNotif").text(notif);
+console.log(poleJSON[poradie]);
+$(modal).find("#infoModalDate").html(enddate);
+$(modal).find("#infoModalEmail").html(email);
+$(modal).find("#infoModalName").html(name);
+$(modal).find("#infoModalNotif").html(notif);
 $(modal).find("#infoModalFiles").html(nazvySuborov);
 $(modal).find("#infoModaldateDIff").html(dateDIffStatus);
 $(modal).find("#infoModalDownloadButton").attr("href", '/download?area='+(area+1)+'&name='+nazov);

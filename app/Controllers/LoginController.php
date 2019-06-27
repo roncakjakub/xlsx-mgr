@@ -57,14 +57,14 @@
 			if($attIP=$this->loginModel->checkbrute($this->BruteGroup, 30, 8,$index)){
 				otherModel::accountLocking($this->$userFileAdr,1,$index);
 				$ownText="Niekto s IP ".$attIP. " chcel vstúpiť na stránku cez Váš email v krátkom časovom období. Účet je zablokovaný. Pre odblokovanie stlačte tlaćidlo nižšie.";
-				$link = $this->unlockKey."&id=".$index;
+				$emailData["link"] = $this->unlockKey."&id=".$index;
+				$emailData["nadpis"] = "Varovanie";
+				$emailData["oslovenie"]= "Administrátor";
 				
-				$nadpis = "Varovanie";
-				$oslovenie= "Administrátor";
-				$myMail= "admin@probim.sk";
-				include_once $this->mailFileRoute.'/_top.php';
-				include_once $this->mailFileRoute.'/disableAcc.php';
-				include_once $this->mailFileRoute.'/_bottom.php';
+				$headers = EMAIL_HEADERS. 'From: <probim@probim.sk>' . "\r\n";
+
+				$message=$this->OtherModel->getmailData($this->resources,"disableAcc",$row,$emailData);
+
 				mail($this->settedMail, "Opakovaná neúspešná snaha o vniknutie na stránku.",$message,$headers);
 			} return 0;
 	}

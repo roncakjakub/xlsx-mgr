@@ -1,9 +1,10 @@
 <?php 
 class UploadController
 {
-	private $name,$text,$cronRoute,$otherModel;
-	public function __construct($om){
-		$this->otherModel = $om;
+	private $name,$text,$cronRoute,$otherModel,$dbCtrl;
+	public function __construct($om,$dbCtrl){
+        $this->otherModel = $om;
+		$this->dbCtrl = $dbCtrl;
 	}
 	public function init($ascii,$cronRoute){
 			$this->text=otherModel::fromASCII($ascii);
@@ -33,8 +34,9 @@ class UploadController
         else $errArr.=$uploadedFile->getClientFilename()." ";
     }
     if ($update==0) {
-	    $this->otherModel->createUploadXML(0, $adress."/downloadedFiles.xml","down",0);
-	    $this->otherModel->createUploadXML(0, $adress."/downloadedFiles.xml","archiv",1);
+        //zmena konf. dát riadka
+    $rowID=$this->dbCtrl->getID("dataview","nazov=".$nazov." and rowNO = ".$area);
+    $this->dbCtrl->update("riadky",array("downloaded", "archived"),array(0,1),"ID=".$rowID);
     }
     if ($errArr!=="") 
         return $errArr;

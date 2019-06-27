@@ -12,7 +12,7 @@ $app->get('/HEXaCRON', function ($request, $response,$args) use ($data) {
 	// otvorenie súboru cronu
 	require_once ($this->resources.'/procedure.php');
 	return 1;
-});
+})->add(new \Slim\Middleware\Session($sessSettings));
 
 //dokonči bezpečnosť
 /*$app->get('/public/ajax[/{nieco}]', function ($request, $response,$args) use ($data) {
@@ -43,20 +43,15 @@ $app->get('/unlock/{hash}&id={id}', function ($request, $response,$args) use ($d
 
 $app->get('/expirKnow/{file}&area={area}', function ($request, $response,$args) use ($data) {
 
+	$rowID=$this->DbController->getID("dataview","nazov=".$args["file"]."and rowNO = ".$args["area"]);
 
-
-    $this->createUploadXML(0, $this->resources."/neov_platby/".$file."/".$args["area"]."/downloadedFiles.xml","expirKnow",1);
-		if($args["hash"]==$this->LoginController->unlockKey)
-			{
-
-				//prestav hodnoty a vlož nový bezpečnostný kód
-			if($this->OtherModel->accountLocking($this->resources."/secXML/users.xml",0,$id,$this->LoginModel->createCheckString()))
-				$this->session->set('alert', 1);
-			else $this->session->set('alert', 0);
-		}
-		else $this->session->set('alert', 0);
-		return true;	
+    if($this->DbController->update("riadky",array("expirKnow"),array(1),"ID=".$rowID))
+		$this->session->set('alert', 1);
+	else $this->session->set('alert', 0);
+	return true;	
 })->add(new \Slim\Middleware\Session($sessSettings));
+	
+
 				/********************************
 					Nahratie súborov investora
 				********************************/
@@ -71,7 +66,11 @@ $app->get('/upload/{ascii}&area={area}&email={email}', function ($request, $resp
 	$data['baseurl'] = $request->getUri()->getBaseUrl();
 	$this->UploadController->init($args["ascii"], $this->resources);
     $this->AdminController->configuration($this->resources.'/secXML/xlsxConf.xml');
-	$xlsxStack=$this->AdminController->loadXLSXs($this->resources, "xlsxs", "neov_platby");
+	$xlsxStack=$this->AdminController->loadXLSXs($this->resources, "xlsxs" );
+
+
+	//Zrýchliť by to bolo možné vytiahnutím iba tých dát z DB, ktoré sú relevantné
+
 
 	/*************************************
 		Skontroluje, či sedú názov z GET-u s názvom súboru
@@ -82,8 +81,9 @@ $app->get('/upload/{ascii}&area={area}&email={email}', function ($request, $resp
 	}else{
 		$data["fileName"]=explode(".", basename($data["fileName"]))[0];
 		foreach ($xlsxStack as $xlsxData)
-			if ($data["fileName"]==$xlsxData["fileName"]&&$xlsxData["fileData"][$args["area"]-1]["email"] == $args["email"])
-				return $this->OtherModel->drawBasicPage($this->view,$response,$data,'views/upload/index.phtml');
+			foreach ($xlsxData[$args["area"]]["emailArr"] as $key => $email) 	
+					if ($email == $args["email"])
+						return $this->OtherModel->drawBasicPage($this->view,$response,$data,'views/upload/index.phtml');
 
 	/*************************************
 		Ak niečo nesedí, vráť ERROR SESSION.
@@ -113,14 +113,14 @@ $app->post('/upload/{ascii}&area={area}&email={email}', function ($request, $res
 	$uplStatus=$this->UploadController->uploadFiles($directory,$uploadedFiles['checkPaymentFile'], $possFormats,0,$post["fileName"],$args["area"]);
     if($uplStatus===1){
     	$this->AdminController->configuration($this->resources.'/secXML/xlsxConf.xml');
-		$xlsxStack=$this->AdminController->loadXLSXs($this->resources, "xlsxs", "neov_platby");   
+		$xlsxStack=$this->AdminController->loadXLSXs($this->resources, "xlsxs" );   
 
 	/*****************************
 		Zistenie mena z xlsxs
 	*****************************/
     	foreach ($xlsxStack as $xlsxData) 
     	if (OtherModel::fromASCII($args["ascii"])==$xlsxData["fileName"]) {
-		$uploaderName=$xlsxData["fileData"][$args["area"]-1]["name"];
+		$uploaderName=$xlsxData[$args["area"]-1]["name"];
 		break;
     	}
     /*****************************
@@ -145,6 +145,26 @@ $app->post('/upload/{ascii}&area={area}&email={email}', function ($request, $res
 
     	return $response->withRedirect("./".$args["ascii"]."&area=".$args["area"]."&email=".$args["email"]."");
     	}
+    
+})->add(new \Slim\Middleware\Session($sessSettings));
+
+	/********************
+		Vyhľadávanie
+	********************/
+
+$app->post('/search', function ($request, $response,$args) use ($data) {
+
+	/********************
+		Nastavenie
+	********************/
+	$data['baseurl'] = $request->getUri()->getBaseUrl();
+	$directory = "../resources/neov_platby";
+	$post=$request->getParsedBody();
+	$xlsxData=$this->AdminController->loadXLSXs($this->resources,"xlsxs",NULL,NULL,$post["string"]);
+	$data["preparedData"]=$this->AdminController->prepareData($xlsxData);
+		//ajaxom pošli dáta 
+    	return $response;
+    	
     
 })->add(new \Slim\Middleware\Session($sessSettings));
 				/********************************
@@ -251,30 +271,36 @@ $app->post('/admin[/{section}[/{adds}]]', function ($request, $response,$args) u
 					Vytiahni dáta z oboch súborov
 			*************************************************/
     			$this->AdminController->configuration($this->resources.'/secXML/xlsxConf.xml');
-				$xlsxStackNew=$this->AdminController->loadXLSXs($this->resources, "tempXLSXS", "neov_platby","noAccFiles");
-				foreach ($xlsxStackNew as $file) {
-					$newRows=$delRows=$updateRows=$newI=$updateIndex=array();
-				$xlsxStackOld=$this->AdminController->loadXLSXs($this->resources, "xlsxs", "neov_platby","noAccFiles",$file["fileName"]);  
-				$newFileData=$file["fileData"];
-				$oldFileData=$xlsxStackOld[0]["fileData"];
 
-				if(empty($xlsxStackOld)) echo"Nima"; // Zapíš si jeho názov a kappa niečo ....
+				foreach (glob($this->resources."/tempXLSXS/*") as $index => $newFileAdr) {
+
+					$newRows=$delRows=$updateRows=$newI=$updateIndex=array();
+					$fileName = explode(".",basename($newFileAdr))[0];
+					
+					$newFileData=$this->AdminController->XLSXSFirstData($newFileAdr);
+					$oldFileData=$this->AdminController->XLSXSFirstData($this->resources."/xlsxs/".basename($newFileAdr));
+					$oldSQLData=$this->AdminController->loadXLSXs($this->resources, "xlsxs" ,"noAccFiles",$fileName);  
+
+				
 			/*************************************************
 					Zadanie countera
 			*************************************************/
 				$newCount = sizeof($newFileData);
 				$oldCount = sizeof($oldFileData);
-				
+
 				$counter =($newCount>=$oldCount)?$newCount:$oldCount;
 				for ($i=0; $i < $counter ; $i++) {
-					$newDateDiff=$this->OtherModel->dateDiff($newFileData[$i]["enddate"]);
-					$oldDateDiff=$this->OtherModel->dateDiff($oldFileData[$i]["enddate"]);
+					
+					$key = array_search(($i+1), array_column($oldSQLData[$index], 'rowNO'));
+
+					$newDateDiff=$this->OtherModel->dateDiff($newFileData[$i]["endDate"]);
+					$oldDateDiff=$this->OtherModel->dateDiff($oldFileData[$i]["endDate"]);
 		/*************************************************
 				V prípade, že existuje starý riadok a nový nie (odstráň)
 		*************************************************/
 
-					if ((isset($newFileData[$i]["empty"])||$newFileData[$i]==NULL)&&!isset($oldFileData[$i]["empty"])) {
-						if (($oldFileData[$i]["archived"]==0)&&$oldDateDiff>30)
+					if (($oldFileData[$i]["empty"]==0)&&($newFileData[$i]["empty"]==1)) {
+							if (($oldSQLData[$index][$key]["archived"]==0)&&$oldDateDiff>30)
 							array_push($delRows, $i+1);
 						//odstráň riadky
 							continue;
@@ -283,7 +309,7 @@ $app->post('/admin[/{section}[/{adds}]]', function ($request, $response,$args) u
 				V prípade, že existuje nový riadok a starý nie (pridaj)
 		*************************************************/
 		
-					if (!isset($newFileData[$i]["empty"])&&(isset($oldFileData[$i]["empty"])||$oldFileData[$i]==NULL)) {
+					if (($newFileData[$i]["empty"]==0)&&($oldFileData[$i]["empty"]==1)) {
 						if ($newDateDiff>30){	
 							array_push($newRows, $newFileData[$i]);
 							array_push($newI, $i+1);
@@ -294,38 +320,36 @@ $app->post('/admin[/{section}[/{adds}]]', function ($request, $response,$args) u
 		/*************************************************
 				V prípade, že existuje starý aj nový riadok 
 		*************************************************/
-					if (!isset($oldFileData[$i]["empty"])&&!isset($newFileData[$i]["empty"])) 
-						if ($newDateDiff>30&&$oldDateDiff>30&&$oldFileData["deleted"]==0)
+					if (($newFileData[$i]["empty"]==0)&&($oldFileData[$i]["empty"]==0)) 
+						if ($newDateDiff>30&&$oldDateDiff>30)
 							if ($newFileData[$i] != $oldFileData[$i]) {
-							
 								array_push($updateRows, $newFileData[$i]);
 								array_push($updateIndex, $i+1);
 							}
 						
 				}
 
-
 				/***********************
 					Pridaj nové riadky
 				************************/
 				if (!empty($newRows)) 
 					
-					$this->AdminController->addXLSXRow($this->resources,$file["fileName"], $newRows, $oldCount,$newI);
+					$this->AdminController->addXLSXRow($this->resources,$fileName, $newRows, $oldCount,$newI);
 				/***********************
 					Odstráň riadky
 				************************/
 				if(!empty($delRows))
-					$this->AdminController->delXLSXRow($this->resources,$file["fileName"], $delRows);
+					$this->AdminController->delXLSXRow($this->resources,$fileName, $delRows);
 				/***********************
 				  Zameň riadky za nové
 				************************/
 
 				if(!empty($updateRows))
-					$this->AdminController->editXLSXRow($this->resources,$file["fileName"],$updateRows,$updateIndex);
+					$this->AdminController->editXLSXRow($this->resources,$fileName,$updateRows,$updateIndex);
 
 			}
 			
-			$this->AdminController->delete($this->resources."/tempXLSXS/".$file["fileName"]);
+			$this->AdminController->delete($this->resources."/tempXLSXS/".$fileName);
 				
 			}
 
@@ -354,8 +378,8 @@ $app->get('/admin[/{section}[/{adds}]]', function ($request, $response,$args) us
 	if (!$this->LoginModel->login_check($this->LoginController,$this->session,$this->LoginController->settedPass,$this->LoginController->locked)) 
 		return $response->withRedirect($data['baseurl']);	
 	$this->AdminController->configuration($this->resources. '/secXML/xlsxConf.xml');
-			$data["bookCount"]=$this->AdminController->loadXLSXs($this->resources,"xlsxs", "neov_platby","newFilesCount");
-			$data["expirCount"]=$this->AdminController->loadXLSXs($this->resources,"xlsxs", "neov_platby","expiredCount");
+			$data["bookCount"]=$this->AdminController->loadXLSXs($this->resources,"xlsxs" ,"newFilesCount");
+			$data["expirCount"]=$this->AdminController->loadXLSXs($this->resources,"xlsxs" ,"expiredCount");
 
 	$data["permitAble"]=1;
 	$data["preferDown"]=0;
@@ -380,9 +404,8 @@ $app->get('/admin[/{section}[/{adds}]]', function ($request, $response,$args) us
 		$section=$args["section"];
 		if ($section=="home") {
 			$data["typ"] = "xlsxs";
-			$data["platba"] = "neov_platby";
-			$xlsxData=$this->AdminController->loadXLSXs($this->resources,$data["typ"], $data["platba"],"home");
-			$data["preparedData"]=$this->AdminController->prepareData($xlsxData);
+			$xlsxData=$this->AdminController->loadXLSXs($this->resources,$data["typ"],"home");
+	$data["preparedData"]=$this->AdminController->prepareData($xlsxData);
 	$this->view->render($response, 'views/admin/home.phtml',$data);
 	return $this->view->render($response, 'inc/_bottom.phtml');
 		}
@@ -427,8 +450,7 @@ $app->get('/admin[/{section}[/{adds}]]', function ($request, $response,$args) us
 			$data["permitAble"]=0;
 			$data["preferDown"]=1;
 			$data["typ"] = "xlsxs";
-			$data["platba"] = "neov_platby";
-			$xlsxData=$this->AdminController->loadXLSXs($this->resources,$data["typ"], $data["platba"],"book");
+			$xlsxData=$this->AdminController->loadXLSXs($this->resources,$data["typ"],"book");
 			$data["preparedData"]=$this->AdminController->prepareData($xlsxData);
 
 			$data["newFilesTyp"] = "xlsxs";
@@ -451,7 +473,6 @@ $app->get('/admin[/{section}[/{adds}]]', function ($request, $response,$args) us
 						Pred 1. emailom
 					*************************/
 					$data["typ"] = "xlsxs";
-					$data["platba"] = "neov_platby";
 					$XLSXpodm = $args["adds"];
 				}
 				if ($args["adds"]=="notif1"){
@@ -459,7 +480,6 @@ $app->get('/admin[/{section}[/{adds}]]', function ($request, $response,$args) us
 						Po 1. emaili
 					*************************/
 					$data["typ"] = "xlsxs";
-					$data["platba"] = "neov_platby";
 					$XLSXpodm = $args["adds"];
 				}
 				if ($args["adds"]=="notif2"){
@@ -467,7 +487,6 @@ $app->get('/admin[/{section}[/{adds}]]', function ($request, $response,$args) us
 						Po potvrdení
 					*************************/
 					$data["typ"] = "xlsxs";
-					$data["platba"] = "neov_platby";
 					$XLSXpodm = $args["adds"];
 					$data["permitAble"]=0;
 					$data["preferDown"]=1;
@@ -475,11 +494,10 @@ $app->get('/admin[/{section}[/{adds}]]', function ($request, $response,$args) us
 			}
 			else{
 				$data["typ"] = "xlsxs";
-				$data["platba"] = "neov_platby";
 				$XLSXpodm = "init";
 			}
 			$data["active"]=isset($args["adds"])?$args["adds"]:"init";
-	$xlsxData=$this->AdminController->loadXLSXs($this->resources,$data["typ"], ((isset($data["platba"]))?$data["platba"]:NULL), ((isset($XLSXpodm))?$XLSXpodm:NULL));
+	$xlsxData=$this->AdminController->loadXLSXs($this->resources,$data["typ"], ((isset($XLSXpodm))?$XLSXpodm:NULL));
 			$data["preparedData"]=$this->AdminController->prepareData($xlsxData);
 	
 			$this->view->render($response, 'views/admin/charts.phtml',$data);
@@ -490,7 +508,6 @@ $app->get('/admin[/{section}[/{adds}]]', function ($request, $response,$args) us
 						Po skončení platnosti
 					*************************/
 					$data["typ"] = "xlsxs";
-					$data["platba"] = "neov_platby";
 					$data["permitAble"]=0;
 					$data["preferDown"]=1;
 					$XLSXpodm = "expired";
@@ -505,10 +522,9 @@ $app->get('/admin[/{section}[/{adds}]]', function ($request, $response,$args) us
 		}
 	}else{
 	$data["typ"] = "xlsxs";
-	$data["platba"] = "neov_platby";
 	$XLSXpodm = "home";
 	}
-	$xlsxData=$this->AdminController->loadXLSXs($this->resources,$data["typ"], ((isset($data["platba"]))?$data["platba"]:NULL), ((isset($XLSXpodm))?$XLSXpodm:NULL));
+	$xlsxData=$this->AdminController->loadXLSXs($this->resources,$data["typ"], ((isset($XLSXpodm))?$XLSXpodm:NULL));
 			$data["preparedData"]=$this->AdminController->prepareData($xlsxData);
 
 	
@@ -526,10 +542,10 @@ $app->get('/download', function ($request, $response,$args) use ($data) {
 		return $response->withRedirect($data['baseurl']);
 			//stiahnutie 1 súboru
 		if (isset($get["fileNO"])) 
-		$this->OtherModel->downloadZIP($get["name"],$get["area"],$this->resources,$get["fileNO"]);
+		$this->OtherModel->downloadZIP($get["name"],$get["area"],$this->resources,$this->DbController,$get["fileNO"]);
 			//stiahnutie všetkých súborov
 		else
-		$this->OtherModel->downloadZIP($get["name"],$get["area"],$this->resources);
+		$this->OtherModel->downloadZIP($get["name"],$get["area"],$this->resources,$this->DbController);
     
 })->add(new \Slim\Middleware\Session($sessSettings));
     
@@ -551,12 +567,17 @@ $app->post('/', function ($request, $response) use ($data) {
 	    if($this->LoginController->run($post["email"],$post["p"],$this->resources."/secXML/IPbrutes.xml", $this->resources.'/mail', "OrigSessVal")){
 	    	if ($this->session->sent==0) {
 	    		$this->session->set('checkString', $this->LoginModel->createCheckString());
-	    		$nadpis = "Potvrdzovací kód";
-	    		$ownText="Váš prihlasovací kód: ".$this->session->checkString;
-	    		$myMail="admin@probim.sk";
+	    		
+	    		$emailData["nadpis"] = "Potvrdzovací kód";
+	    		$emailData["oslovenie"] = "Vážený administrátor";
+	    		$emailData["content"]="Váš prihlasovací kód: ".$this->session->checkString;
+	    		
+	    		$email=$this->LoginController->settedMail;
 	    		$subject="Potvrdzovací kód";
-	    		$hisMail=$this->LoginController->settedMail;
-	    		if($this->OtherModel->sendOwnMail($this->resources,$myMail,$hisMail,$subject,$nadpis,$ownText)){
+				$headers = EMAIL_HEADERS. 'From: <probim@probim.sk>' . "\r\n";
+        
+        		$message=$this->OtherModel->getmailData($this->resources,"expirMail",NULL,$emailData);
+	    		if(mail($email,$subject,$message[0],$headers)){
 		    		//Zabráni viacnásobnému generovaniu kódu
 		    		$this->session->set('sent', 1);
 		    	}

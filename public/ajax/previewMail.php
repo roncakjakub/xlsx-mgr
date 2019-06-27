@@ -1,10 +1,9 @@
 <?php 
-if (isset($_POST["nazov"],$_POST["oslovenie"],$_POST["popis"],$_POST["cena"])) {
+if (isset($_POST["nazov"],$_POST["oslovenie"],$_POST["content"])) {
 	$message="";
 	$nadpis = "1. upozornenie";
 	$oslovenie= $_POST["oslovenie"];
-	$popis = $_POST["popis"];
-	$cena = $_POST["cena"];
+	$content = $_POST["content"];
 
 	include_once '../../resources/mail/_top.php'; 
 	include_once '../../resources/mail/first.php'; 
