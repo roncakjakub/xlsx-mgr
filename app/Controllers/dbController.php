@@ -7,6 +7,8 @@ class DbController
 	function __construct($pdo)
 	{
 		$this->pdo = $pdo;
+		$this->pdo->query("SET NAMES UTF8");
+		
 	}
 
 	/**
@@ -51,7 +53,10 @@ class DbController
 			Ak jestem where, pridaj k nemu aj slovíčko do klauzuly.
 		********************************/
 		$where=($where)? "where ".$where : "" ;
-		return $this->pdo->query("SELECT ID as id FROM ".$table." ".$where)->fetch()["id"];
+
+		if($res=$this->pdo->query("SELECT ID FROM ".$table." ".$where))
+		return $res->fetch()["ID"];
+		else return false;
 	}
 	/**
      * @param $table - tabuľka

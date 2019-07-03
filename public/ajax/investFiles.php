@@ -22,9 +22,7 @@ if (isset($_POST["nazov"],$_POST["area"])){
 ?>
 <br class="w-100">
 <div class="row align-items-center justify-content-between">
-	<?php $xlsxsFolder = explode("/", $_POST["xlsxs"]); 
-	$xlsxsFolder=$xlsxsFolder[sizeof($xlsxsFolder)-2];
-	?>
+	
 		<a href="/download?area=<?php echo $_POST["area"] ?>&name=<?php echo $_POST["nazov"]?>" class="col-3 clr-black">Stiahni všetky súbory</a>
 </div>
 </div>

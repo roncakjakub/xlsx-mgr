@@ -280,27 +280,33 @@ $app->post('/admin[/{section}[/{adds}]]', function ($request, $response,$args) u
 					$newFileData=$this->AdminController->XLSXSFirstData($newFileAdr);
 					$oldFileData=$this->AdminController->XLSXSFirstData($this->resources."/xlsxs/".basename($newFileAdr));
 					$oldSQLData=$this->AdminController->loadXLSXs($this->resources, "xlsxs" ,"noAccFiles",$fileName);  
-
 				
 			/*************************************************
 					Zadanie countera
 			*************************************************/
 				$newCount = sizeof($newFileData);
 				$oldCount = sizeof($oldFileData);
-
 				$counter =($newCount>=$oldCount)?$newCount:$oldCount;
 				for ($i=0; $i < $counter ; $i++) {
 					
-					$key = array_search(($i+1), array_column($oldSQLData[$index], 'rowNO'));
+					$SQLkey = $this->OtherModel->findIndex($oldSQLData[$index], 'rowNO',($i+1));
 
 					$newDateDiff=$this->OtherModel->dateDiff($newFileData[$i]["endDate"]);
 					$oldDateDiff=$this->OtherModel->dateDiff($oldFileData[$i]["endDate"]);
+	
+	/*
+var_dump($newDateDiff);
+echo "<br><br>";
+var_dump($oldDateDiff);
+echo "<br><br>";
+echo "<br><br>";
+*/
 		/*************************************************
 				V prípade, že existuje starý riadok a nový nie (odstráň)
 		*************************************************/
 
 					if (($oldFileData[$i]["empty"]==0)&&($newFileData[$i]["empty"]==1)) {
-							if (($oldSQLData[$index][$key]["archived"]==0)&&$oldDateDiff>30)
+							if (($oldSQLData[$index][$SQLkey]["archived"]==0)&&$oldDateDiff>30)
 							array_push($delRows, $i+1);
 						//odstráň riadky
 							continue;
@@ -324,11 +330,19 @@ $app->post('/admin[/{section}[/{adds}]]', function ($request, $response,$args) u
 						if ($newDateDiff>30&&$oldDateDiff>30)
 							if ($newFileData[$i] != $oldFileData[$i]) {
 								array_push($updateRows, $newFileData[$i]);
+								$updateRows[sizeof($updateRows)-1]["nameArr"]=$oldSQLData[$index][$SQLkey]["nameArr"];
+								$updateRows[sizeof($updateRows)-1]["emailArr"]=$oldSQLData[$index][$SQLkey]["emailArr"];
 								array_push($updateIndex, $i+1);
 							}
 						
 				}
-
+/*
+var_dump($newRows);
+echo "<br><br>";
+var_dump($delRows);
+echo "<br><br>";
+var_dump($updateRows);
+echo "<br><br>";
 				/***********************
 					Pridaj nové riadky
 				************************/
