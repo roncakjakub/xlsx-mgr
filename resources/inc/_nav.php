@@ -40,6 +40,11 @@
                     <i class="fas fa-file-upload"></i> <p>Aktualizácia</p>
                 </a>
             </div>
+            <div class="menu_item ">
+                <a href="<?php echo $data["baseurl"]; ?>/admin/search">
+                    <i class="fas fa-search"></i> <p>Vyhľadávanie</p>
+                </a>
+            </div>
         </div>
         <div class="menu_item logout">
         	<a href="<?php echo $data["baseurl"]; ?>/admin/logout">

@@ -34,10 +34,6 @@ class OtherModel{
      * @param null $newKey
      * @return int
      */
-    public function findIndex($array, $column,$needle){
-        $columns=array_column($array, $column);
-        return array_search($needle, $columns);
-    }
     public function accountLocking($file, $stav, $index, $newKey=NULL){
         libxml_disable_entity_loader(false);
  		$doc = new DOMDocument();
@@ -128,7 +124,7 @@ class OtherModel{
             }
         }
     }
-    public function primaryConfXlsx($name,$resFolder,$dbCtrl,$rowStack){
+    public function primaryConfXlsx($name,$resFolder,$dbCtrl,$max){
         /**************************************
             Vytvorenie priečinkov na súbory
         **************************************/
@@ -138,9 +134,9 @@ class OtherModel{
                 ***************************/
             if(!$fileID=$dbCtrl->insert("subory","nazov",array($name))) return false;
                       
-        foreach($rowStack as $row){
-            if (empty(glob($resFolder."/neov_platby/".$name."/".$row)))
-                if(!mkdir($resFolder."/neov_platby/".$name."/".$row))return false; 
+        for ($i=1; $i <= $max; $i++){
+            if (empty(glob($resFolder."/neov_platby/".$name."/".$i)))
+                if(!mkdir($resFolder."/neov_platby/".$name."/".$i))return false; 
         }
         return $fileID;
     }

@@ -148,26 +148,8 @@ $app->post('/upload/{ascii}&area={area}&email={email}', function ($request, $res
     
 })->add(new \Slim\Middleware\Session($sessSettings));
 
-	/********************
-		Vyhľadávanie
-	********************/
 
-$app->post('/search', function ($request, $response,$args) use ($data) {
-
-	/********************
-		Nastavenie
-	********************/
-	$data['baseurl'] = $request->getUri()->getBaseUrl();
-	$directory = "../resources/neov_platby";
-	$post=$request->getParsedBody();
-	$xlsxData=$this->AdminController->loadXLSXs($this->resources,"xlsxs",NULL,NULL,$post["string"]);
-	$data["preparedData"]=$this->AdminController->prepareData($xlsxData);
-		//ajaxom pošli dáta 
-    	return $response;
-    	
-    
-})->add(new \Slim\Middleware\Session($sessSettings));
-				/********************************
+			/********************************
 					Adminstrátor
 				********************************/
 
@@ -280,33 +262,27 @@ $app->post('/admin[/{section}[/{adds}]]', function ($request, $response,$args) u
 					$newFileData=$this->AdminController->XLSXSFirstData($newFileAdr);
 					$oldFileData=$this->AdminController->XLSXSFirstData($this->resources."/xlsxs/".basename($newFileAdr));
 					$oldSQLData=$this->AdminController->loadXLSXs($this->resources, "xlsxs" ,"noAccFiles",$fileName);  
+
 				
 			/*************************************************
 					Zadanie countera
 			*************************************************/
 				$newCount = sizeof($newFileData);
 				$oldCount = sizeof($oldFileData);
+
 				$counter =($newCount>=$oldCount)?$newCount:$oldCount;
 				for ($i=0; $i < $counter ; $i++) {
 					
-					$SQLkey = $this->OtherModel->findIndex($oldSQLData[$index], 'rowNO',($i+1));
+					$key = array_search(($i+1), array_column($oldSQLData[$index], 'rowNO'));
 
 					$newDateDiff=$this->OtherModel->dateDiff($newFileData[$i]["endDate"]);
 					$oldDateDiff=$this->OtherModel->dateDiff($oldFileData[$i]["endDate"]);
-	
-	/*
-var_dump($newDateDiff);
-echo "<br><br>";
-var_dump($oldDateDiff);
-echo "<br><br>";
-echo "<br><br>";
-*/
 		/*************************************************
 				V prípade, že existuje starý riadok a nový nie (odstráň)
 		*************************************************/
 
 					if (($oldFileData[$i]["empty"]==0)&&($newFileData[$i]["empty"]==1)) {
-							if (($oldSQLData[$index][$SQLkey]["archived"]==0)&&$oldDateDiff>30)
+							if (($oldSQLData[$index][$key]["archived"]==0)&&$oldDateDiff>30)
 							array_push($delRows, $i+1);
 						//odstráň riadky
 							continue;
@@ -330,19 +306,11 @@ echo "<br><br>";
 						if ($newDateDiff>30&&$oldDateDiff>30)
 							if ($newFileData[$i] != $oldFileData[$i]) {
 								array_push($updateRows, $newFileData[$i]);
-								$updateRows[sizeof($updateRows)-1]["nameArr"]=$oldSQLData[$index][$SQLkey]["nameArr"];
-								$updateRows[sizeof($updateRows)-1]["emailArr"]=$oldSQLData[$index][$SQLkey]["emailArr"];
 								array_push($updateIndex, $i+1);
 							}
 						
 				}
-/*
-var_dump($newRows);
-echo "<br><br>";
-var_dump($delRows);
-echo "<br><br>";
-var_dump($updateRows);
-echo "<br><br>";
+
 				/***********************
 					Pridaj nové riadky
 				************************/
@@ -367,6 +335,19 @@ echo "<br><br>";
 				
 			}
 
+		}
+
+				/********************
+					Vyhľadávanie
+				********************/
+
+		if ($section=="search") {
+			$data['baseurl'] = $request->getUri()->getBaseUrl();
+			include '../public/ajax/searchAnswer.php';
+			$directory = "../resources/neov_platby";
+			$post=$request->getParsedBody();
+			$xlsxData=$this->AdminController->loadXLSXs($this->resources,"xlsxs",NULL,NULL,$post["string"]);
+    		return $this->AdminController->prepareData($xlsxData);
 		}
 
 		if ($section=="fileConfirm") {
@@ -528,6 +509,10 @@ $app->get('/admin[/{section}[/{adds}]]', function ($request, $response,$args) us
 				}
 		if ($section=="update") {
 			return $this->OtherModel->drawBasicPage($this->view,$response,$data,'views/admin/update.phtml');
+		}
+		if ($section=="search") {
+			$this->view->render($response, 'views/admin/fullview.phtml',$data);
+			return $this->view->render($response, 'inc/_bottom.phtml');
 		}
 		if ($section=="logout") {
 

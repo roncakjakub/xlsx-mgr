@@ -1,17 +1,3 @@
-function ajaxSearch(el,url){
-  var string = el.value;
-  var request = $.ajax({
-  url: url+"/search",
-  method: "POST",
-  data: { string: string },
-  dataType: "html"
-});
- 
-request.done(function( msg ) {
- var body=($($.parseHTML(msg)));
- $("#searchAnswer").html(body);
-});  
-}
 
 function uploadFileName(el){
   var files = el.files; 
@@ -111,6 +97,24 @@ function regformhash(form, email, password, conf) {
     // Finally submit the form. 
     form.submit();
     return true;
+}
+
+function ajaxSearch(el){
+  var string = el.value;
+  var status = $("#status").val();
+  var orderBy = $("#orderBy").val();
+  var request = $.ajax({
+  url: window.location.href,
+  dataType: 'json',
+  contentType: 'application/json',
+  method: "POST",
+  data: { string: string, status: status, orderBy: orderBy },
+});
+ 
+request.done(function( msg ) {
+ var body=($($.parseHTML(msg)));
+ $("#searchAnswer").html(body);
+}); 
 }
 
 function ajaxPreview(poradie,area) {

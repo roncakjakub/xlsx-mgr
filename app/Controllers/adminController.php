@@ -61,8 +61,8 @@
 		$objPHPExcel->setActiveSheetIndex(0);
 		return $objPHPExcel;
     }
-    public function delCols($obj,$max,$row,$min="A"){
-    	for ($i=$min; $i <= $max; $i++)
+    public function delCols($obj,$min,$max,$row){
+    	for ($i=$min; $i <= $max; $i++) 
 			$obj->getActiveSheet()
 				->setCellValue($i.$row, NULL);
 
@@ -71,9 +71,8 @@
 		$objPHPExcel = $this->readXLSX($res."/xlsxs/".$fileName.".xlsx");
 		$topCol=$objPHPExcel->setActiveSheetIndex(0)->getHighestColumn();
 		foreach ($iArray as $i => $index) {
-			$rowID=$this->dbCtrl->getID("dataview","nazov=".$fileName." and rowNO = ".$index);
 			// Odstráň najprv riadky v xlsxs
-			$this->delCols($objPHPExcel,$topCol,$index,"A");
+			$this->delCols($objPHPExcel,"A",$topCol,$index);
 			// Potom odstráň konfig. súbory
 			$this->delete($res."/neov_platby/".$fileName."/".$index);
 			// Odstránenie z DB
@@ -88,166 +87,48 @@
 		// Add column headers
 		$topCol=$objPHPExcel->setActiveSheetIndex(0)->getHighestColumn();
 		foreach ($iArray as $i => $index) {
-			$okOldArr = $okNewArr = $okSQLArr = $okEmailOldArr = $okEmailNewArr = array();
-			$finalName = $finalEmail = "";
-
-			foreach ($rows[$i]["name"] as $nameI => $name) {
-				$finalName.=$name;
-				$finalEmail.=$rows[$i]["email"][$nameI];
-
-				if ($nameI<(sizeof($rows[$i]["name"])-1)) {
-					$finalName.=  "\n";
-					$finalEmail.= "\n";
-
-				}
-			}
 			$objPHPExcel->getActiveSheet()
-				->setCellValue('A'.($index), $finalName)
-				->setCellValue('B'.($index), $finalEmail)
-				->setCellValue('C'.($index), $rows[$i]["endDate"])
+				->setCellValue('A'.($index), $rows[$i]["name"])
+				->setCellValue('B'.($index), $rows[$i]["email"])
+				->setCellValue('C'.($index), $rows[$i]["enddate"])
 				->setCellValue('D'.($index), $rows[$i]["notif"])
-				->setCellValue('E'.($index), $rows[$i]["content"]);
+				->setCellValue('E'.($index), $rows[$i]["popis"]);
 
 			// OdstráŇ zvyšné stĺpce ak je viac položiek
-			/*if($topCol>$last_used_col)
-				$this->delCols($objPHPExcel,$topCol,$index,$last_used_col);
-			*/
-
-			//Najprv potrebujem zistiť ID daného riadku v DB
+			if($topCol>$last_used_col)
+				$this->delCols($objPHPExcel,$last_used_col,$topCol,$index);
+			
+			//uprav záznam v DB
 			$rowID=$this->dbCtrl->getID("dataview","nazov=".$fileName." and rowNO = ".$index);
-					
-			$prepDate = explode('.', $rows[$i]["endDate"]);
-			$finalDate=$prepDate[2]."-".$prepDate[1]."-".$prepDate[0];	
-			//a upraviť jej samotné dáta
+			
+			//uprav priradenie investorov
+			array_push($invArr,$this->dbCtrl->select("inv_midd","investor_fk","investori.meno=".$rows[$i]["name"],"investori on investori.ID=inv_midd.investor_fk"));
+			if (!in_array($rows[$i]["name"], $invArr)) {
+				
+
+				//Premeň investorov, ktorí sú zamenení
+			//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!SDasdsa!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+			}
+			//nahraj nové data riadkov
+			$this->dbCtrl->update("riadky",$colsArray,$valArray,"ID=".$rowID);
+			}
 			$colsArray=array(  
 				"poznamka",
 				"obsah",
 				"expDate"
 			);
 			$valArray=array(
-				$rows[$i]["notif"],
-				$rows[$i]["content"],
-				$finalDate
+				$row["notif"],
+				$row["popis"],
+				$row["enddate"]
 			);
-
 			$this->dbCtrl->update("riadky",$colsArray,$valArray,"ID=".$rowID);
-			
-			// Ťažšia časť je úprava investorov: -> 
+		//}
+			//uprav záznam investorov
+		
 
-			foreach ($rows[$i]["name"] as $nameI => $name) {
-				/*************************************
-					Pokiaľ nieje daný investor v starom poli, pracuj s ním
-					 - array_search vráti iba prvý nájdený index, preto sa nebude v medzitabuľke nachádzať 
-					   niektorý investor viackrát
-				**************************************/
-				$midID=array_search($name, $rows[$i]["nameArr"]);
-				$midEmailID=array_search($rows[$i]["email"][$nameI], $rows[$i]["emailArr"]);
-
-				if($midID===false || $midEmailID===false){
-					/*************************************
-						Pokiaľ nieje daný investor nahraný, pridaj ho do DB a ulož ID
-					**************************************/
-					if(!$midID=$this->dbCtrl->getID("investori","meno= '".$name."' and email= '".$rows[$i]["email"][$nameI]."'"))
-						$midID=$this->dbCtrl->insert("investori","meno, email",array($name, $rows[$i]["email"][$nameI]));	
-
-						array_push($okSQLArr, $midID);	
-						array_push($okNewArr, $nameI);
-						continue;
 					
-				}	
-				else{
-					/*************************************
-						Pokiaľ som našiel meno, ulož jeho starý aj nový index
-					**************************************/
-					if($midID!==false){
-						array_push($okOldArr, $midID);
-						array_push($okNewArr, $nameI);
-					}
-					/*************************************
-						Pokiaľ som našiel email, ulož jeho starý aj nový index
-					**************************************/
-					if($midEmailID!==false){
-						array_push($okEmailOldArr, $midEmailID);
-						array_push($okEmailNewArr, $nameI);
-					}
-
-				}
-				
-			}
-
-				/*************************************
-					Napokon spoj oba polia s mailami a menami
-				---------------------------------------------
-					Nové záznamy
-				**************************************/
-					$okNewArr += $okEmailNewArr;
-
-				/*************************************
-					Staré záznamy
-				**************************************/
-					$okOldArr += $okEmailOldArr;
-			/*************************************
-				Update môžeš urobiť iba na pole starých záznamov, preto budeme nimi prechádzať, postupne s nimi pracovať a odstraňovať ich.
-			**************************************/
-			$oldDiff = array_diff(array_keys($rows[$i]["nameArr"]), $okOldArr);
-			$newDiff = array_diff(array_keys($rows[$i]["name"]), $okNewArr);
-			$okSQLCount = sizeof($okSQLArr);
-
-				$newDiff = array_values($newDiff);
-				$oldDiff = array_values($oldDiff);
-			foreach ($oldDiff as $oldIndex => $oldI) {
-				/*************************************
-					Najskôr spracujeme nových investorov
-				**************************************/
-				if(!empty($okSQLArr)){
-					$invID=$this->dbCtrl->getID("investori","meno= '".$rows[$i]["nameArr"][$oldI]."' and email= '".$rows[$i]["emailArr"][$oldI]."'");
-					$invMiddID = $this->dbCtrl->getID("inv_midd","riadok_fk= '".$rowID."' and investor_fk= '".$invID."'");
-
-					$this->dbCtrl->update("inv_midd",array("investor_fk"),array($okSQLArr[$oldIndex]),"ID=".$invMiddID);
-
-					unset($okSQLArr[$oldIndex]);
-					continue;
-				}
-
-				/*************************************
-					Následne už registrovaných
-				**************************************/
-				if(!empty($newDiff)){
-					$newIndex=0;
-					echo "newI>>>>   ";var_dump($newIndex); echo"<br>";
-					$invID=$this->dbCtrl->getID("investori","meno= '".$rows[$i]["nameArr"][$oldI]."' and email= '".$rows[$i]["emailArr"][$oldI]."'");					
-					$invMiddID = $this->dbCtrl->getID("inv_midd","riadok_fk= '".$rowID."' and investor_fk= '".$invID."'");
-					$newInvID=$this->dbCtrl->getID("investori","meno= '".$rows[$i]["name"][$newDiff[$newIndex]]."' and email= '".$rows[$i]["email"][$newDiff[$newIndex]]."'");
-					
-					$this->dbCtrl->update("inv_midd",array("investor_fk"),array($newInvID),"ID=".$invMiddID);
-					unset($newDiff[$newIndex]);
-					$newIndex++;
-					continue;
-				}
-				/*************************************
-					Ak zvýšili staré, odstráň ich
-				**************************************/		
-					$invID=$this->dbCtrl->getID("investori","meno= '".$rows[$i]["nameArr"][$oldI]."' and email= '".$rows[$i]["emailArr"][$oldI]."'");
-					die($invID);
-					$this->dbCtrl->delete("inv_midd","riadok_fk=".$rowID." and investor_fk= ".$invID);
-			}
-
-				/*************************************
-					Ak zvýšili noví investori, pridaj ich
-				**************************************/
-				foreach ($okSQLArr as $SQLIndex => $SQLI) 
-					$this->dbCtrl->insert("inv_midd","riadok_fk, investor_fk",array($rowID, $SQLI));
-
-
-				/*************************************
-					Ak zvýšili novopriradení investori, pridaj ich
-				**************************************/
-				foreach ($newDiff as $NewIndex => $NewI) {
-					$invID=$this->dbCtrl->getID("investori","meno= '".$rows[$i]["name"][$NewI]."' and email= '".$rows[$i]["email"][$NewI]."'");
-
-					$this->dbCtrl->insert("inv_midd","riadok_fk, investor_fk",array($rowID, $invID));
-				}
-			}				
 		$this->saveXLSX($objPHPExcel, $res,$fileName);
 		return true;
     }
@@ -257,32 +138,20 @@
 		if(!$this->OtherModel->secondaryConfXlsx($fileName,$res,sizeof($newData)+$oldSize,$newI)) return false;
 		// Add column headers
 		foreach ($newData as $key => $row) {
-			$finalName = $finalEmail = "";
-			foreach ($row["name"] as $nameI => $name) {
-				$finalName.=$name;
-				$finalEmail.=$row["email"][$nameI];
-
-				if ($nameI<sizeof($row["name"])) {
-					$finalName.=  "\n";
-					$finalEmail.= "\n";
-
-				}
-			}
-
 			$objPHPExcel->getActiveSheet()
-				->setCellValue('A'.($newI[$key]), $finalName)
-				->setCellValue('B'.($newI[$key]), $finalEmail)
-				->setCellValue('C'.($newI[$key]), $row["endDate"])
+				->setCellValue('A'.($newI[$key]), $row["name"])
+				->setCellValue('B'.($newI[$key]), $row["email"])
+				->setCellValue('C'.($newI[$key]), $row["enddate"])
 				->setCellValue('D'.($newI[$key]), $row["notif"])
-				->setCellValue('E'.($newI[$key]), $row["content"]);
+				->setCellValue('E'.($newI[$key]), $row["popis"]);
 			
 			//vlož záznam o riadku
 			$fileID=$this->dbCtrl->getID("subory","nazov= ".$fileName);
 			//Zisti, či existujú investori a zapamätaj si ich mená
 			$rowID=$this->dbCtrl->getID("dataview","nazov=".$fileName." and rowNO = ".$newI[$key]);
-			foreach ($row["name"] as $nameI =>$name) {
-				if(!$invID=$this->dbCtrl->getID("investori","meno= '".$name."'' and email= '".$row["email"][$nameI]."'"))
-					$invID=$this->dbCtrl->insert("investori","meno, email",array($name, $row["email"][$nameI]));
+			foreach ($row["name"] as $name) {
+				if(!$invID=$this->dbCtrl->getID("investori","meno= ".$row["name"]." and email= ".$row["email"]))
+					$invID=$this->dbCtrl->insert("investori","meno, email",array($row["name"], $row["email"]));
 				$this->dbCtrl->insert("inv_midd","riadok_fk, investor_fk",array($rowID, $invID));
 			}
 			$colsArray=
@@ -298,11 +167,11 @@
 				$newI[$key], 
 				$fileID,
 				$row["notif"],
-				$row["content"],
+				$row["popis"],
 				0,
 				0,
 				0,
-				$row["endDate"]
+				$row["enddate"]
 			);
 
 			/*****************************
@@ -334,6 +203,7 @@
 					$this->dbCtrl->getFullData(NULL,$searchString):
 					$this->dbCtrl->getFullData()
 				);
+			
 			/***************************************
 				Prechádzanie každým riadkom
 			***************************************/

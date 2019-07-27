@@ -7,8 +7,6 @@ class DbController
 	function __construct($pdo)
 	{
 		$this->pdo = $pdo;
-		$this->pdo->query("SET NAMES UTF8");
-		
 	}
 
 	/**
@@ -53,10 +51,7 @@ class DbController
 			Ak jestem where, pridaj k nemu aj slovíčko do klauzuly.
 		********************************/
 		$where=($where)? "where ".$where : "" ;
-
-		if($res=$this->pdo->query("SELECT ID FROM ".$table." ".$where))
-		return $res->fetch()["ID"];
-		else return false;
+		return $this->pdo->query("SELECT ID as id FROM ".$table." ".$where)->fetch()["id"];
 	}
 	/**
      * @param $table - tabuľka
@@ -79,13 +74,23 @@ class DbController
      */
 	
 		function getFullData($possName=NULL,$searchString=NULL){
-			$rowID=0;
-		/********************************
-			Zisti pocet prvkov v velues referencii
-		********************************/
-		$where=($possName)?"nazov=".$possName:NULL;
-		$dbResult=$this->select("dataview","*",$where /*Where hocičo je $searchString*/);
-			
+			$rowID=0;	
+				/****************************************************************
+					Vráť stĺpce, ktoré sa podobajú na hľadaný výraz, ak existuje
+				*****************************************************************/
+			if (!empty($searchString)){
+			$where = "
+				nazov LIKE '%"	.$searchString."%' or 
+				poznamka LIKE '%"	.$searchString."%' or	
+				meno LIKE '%"	.$searchString."%' or	
+				email LIKE '%"	.$searchString."%'
+			";
+			$join = "join inv_midd on dataview.ID=inv_midd.riadok_fk join investori on inv_midd.investor_fk = investori.ID";
+
+			$dbResult=$this->select("dataview","dataview.*",$where, $join);
+			}
+			else	
+			$dbResult=$this->select("dataview","*", (($possName)? "nazov=".$possName:NULL) );
 			while ($row=$dbResult->fetch()) {
 			$invArr=$this->select("investori","investori.*","inv_midd.riadok_fk=".$row["ID"], "join inv_midd on inv_midd.investor_fk=investori.ID");
 				//Ak je, v tomto prípade 0. prvok, NULL - riadok neexistuje 
