@@ -14,17 +14,14 @@ $this->AdminController->configuration($this->resources.'/secXML/xlsxConf.xml');
 			$newXlsxData=$this->AdminController->XLSXSFirstData($file);
 			
 		
-			$rowCounter=0;
-			foreach ($newXlsxData as $rowData)
-				if ($rowData["empty"]!=1) $rowCounter++;
+			$rowStack=array();
+			foreach ($newXlsxData as $rowI => $rowData)
+				if ($rowData["empty"]!=1) array_push($rowStack, ($rowI+1));
 					
-			$fileID=$this->OtherModel->primaryConfXlsx($fileName,$this->resources,$this->DbController,$rowCounter);
+			$fileID=$this->OtherModel->primaryConfXlsx($fileName,$this->resources,$this->DbController,$rowStack);
 				
-			$rowCounter=0;
-			foreach ($newXlsxData as $rowData){
+			foreach ($newXlsxData as $rowCounter => $rowData){
 				if ($rowData["empty"]==1) continue;
-			
-			$rowCounter++;
 			$colsArray="rowNO,subor_fk,poznamka,obsah,downloaded,archived, expirKnow,expDate";
 
 			/*****************************
@@ -32,9 +29,8 @@ $this->AdminController->configuration($this->resources.'/secXML/xlsxConf.xml');
 			*****************************/
 			$workDate=explode(".", $rowData["endDate"]);
 			$finalDate = $workDate[2]."-".$workDate[1]."-".$workDate[0];
-
 			$valArray=array(
-				$rowCounter, 
+				($rowCounter+1), 
 				$fileID,
 				$rowData["notif"],
 				$rowData["content"],
@@ -47,30 +43,26 @@ $this->AdminController->configuration($this->resources.'/secXML/xlsxConf.xml');
 			/*****************************
                 Záznam do DB o riadkoch
         	***************************/
-
-                $rowID=$this->DbController->insert("riadky",$colsArray,$valArray);
-				foreach ($rowData["name"] as $nameI => $name) {
-					/*************************************
-						Pokiaľ nieje daný investor nahraný pridaj ho do DB a ku záznamu
-					**************************************/
-					if(!$invID=$this->DbController->getID("investori","meno= '".$name."' and email= '".$rowData["email"][$nameI]."'")){	
-						$invID=$this->DbController->insert("investori","meno, email",array($name, $rowData["email"][$nameI]));
-						$this->DbController->insert("inv_midd","riadok_fk, investor_fk",array($rowID, $invID));
-					}
-					else{
-					if($this->DbController->getID("inv_midd","riadok_fk= '".$rowCounter."' and investor_fk= '".$invID."'")){	
-						//die();
-						
-					}
-				}
+            $rowID=$this->DbController->insert("riadky",$colsArray,$valArray);
+			foreach ($rowData["name"] as $nameI => $name) {
+				/*************************************
+					Pokiaľ nieje daný investor nahraný pridaj ho do DB
+				**************************************/
+				if(!$invID=$this->DbController->getID("investori","meno= '".$name."' and email= '".$rowData["email"][$nameI]."'"))
+					$invID=$this->DbController->insert("investori","meno, email",array($name, $rowData["email"][$nameI]));
+				/*************************************
+					Pridaj ho ku záznamu, ak tam už nie je
+				**************************************/
+				if(!$this->DbController->getID("inv_midd","riadok_fk= '".$rowID."' and investor_fk= '".$invID."'"))
+				$this->DbController->insert("inv_midd","riadok_fk, investor_fk",array($rowID, $invID));
 			}
-
 		}
 	}
 }
 	/******************************
 		Čítanie z DB
 	*****************************/
+die();
 $xlsxStack=$this->AdminController->loadXLSXs($this->resources, "xlsxs");
 foreach ($xlsxStack as $xlsxData) {
 	foreach ($xlsxData as $rowID => $row) {

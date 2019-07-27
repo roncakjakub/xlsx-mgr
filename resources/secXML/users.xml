@@ -7,5 +7,11 @@
 		<masta>1</masta>
 		<unlockKey>dW9LVghh3F</unlockKey>
 	</user>
-	
-<user><mail>jakub.roncak@gmail.com</mail><pass>$2y$10$Xea.n/epmW34qAupqfsax.cz0Yopg/OHmXtuIYIUlP.VsIiuUFiHO</pass><locked>0</locked><masta>0</masta><unlockKey>uJyhww0fQ7</unlockKey></user></doc>
+	<user>
+		<mail>jakub.roncak@gmail.com</mail>
+		<pass>$2y$10$5OONj/flSisrLprs8In/w.aSmWLdzG7V4Mg6wgxoADd0qw1CMV9Xq</pass>
+		<locked>0</locked>
+		<masta>0</masta>
+		<unlockKey>dW9LVghh3F</unlockKey>
+	</user>
+</doc>

@@ -1,135 +1,124 @@
-@font-face {
-  font-family: "Merriweather";
-  src: url("https://fonts.googleapis.com/css?family=Merriweather");
-}
-@font-face {
-  font-family: "Cardo";
-  src: url("https://fonts.googleapis.com/css?family=Cardo");
-}
-@font-face {
-  font-family: "FontAwesome";
-  src: url("../fonts/fa-solid-900.eot") format("embedded-opentype");
-  src: url("../fonts/fa-solid-900.svg") format("svg");
-  src: url("../fonts/fa-solid-900.ttf") format("truetype");
-  src: url("../fonts/fa-solid-900.woff") format("woff");
-  src: url("../fonts/fa-solid-900.woff2") format("woff2");
-}
-/* line 19, ../../resources/sass/text.sass */
+/* line 7, ../../resources/sass/text.sass */
 .clr-green {
   color: #00ff12 !important;
 }
 
-/* line 21, ../../resources/sass/text.sass */
+/* line 9, ../../resources/sass/text.sass */
 .clr-red {
   color: #ff0000 !important;
 }
 
-/* line 23, ../../resources/sass/text.sass */
+/* line 11, ../../resources/sass/text.sass */
 .clr-org {
   color: #f5981e !important;
 }
 
-/* line 25, ../../resources/sass/text.sass */
+/* line 13, ../../resources/sass/text.sass */
 .clr-black {
   color: black !important;
 }
 
-/* line 27, ../../resources/sass/text.sass */
+/* line 15, ../../resources/sass/text.sass */
 .clr-siva {
   color: #ebebeb !important;
 }
 
-/* line 29, ../../resources/sass/text.sass */
+/* line 17, ../../resources/sass/text.sass */
 .clr-white {
   color: white !important;
 }
 
-/* line 31, ../../resources/sass/text.sass */
+/* line 19, ../../resources/sass/text.sass */
 .font_Arial {
   font-family: Arial;
 }
 
-/* line 33, ../../resources/sass/text.sass */
+/* line 21, ../../resources/sass/text.sass */
 .font_MW {
   font-family: Merriweather;
 }
 
-/* line 35, ../../resources/sass/text.sass */
+/* line 23, ../../resources/sass/text.sass */
 .font_CRD {
   font-family: Cardo;
 }
 
-/* line 37, ../../resources/sass/text.sass */
+/* line 25, ../../resources/sass/text.sass */
 .font_FA {
   font-family: fontAwesome;
 }
 
-/* line 39, ../../resources/sass/text.sass */
+/* line 27, ../../resources/sass/text.sass */
+.font_MS {
+  font-family: Montserrat;
+}
+
+/* line 29, ../../resources/sass/text.sass */
 .about {
   color: #c9c9c9;
 }
 
-/* line 41, ../../resources/sass/text.sass */
+/* line 31, ../../resources/sass/text.sass */
 .font_w_reg {
   font-weight: normal;
 }
 
-/* line 43, ../../resources/sass/text.sass */
+/* line 33, ../../resources/sass/text.sass */
 .font_w_bold {
   font-weight: bold;
 }
 
-/* line 45, ../../resources/sass/text.sass */
+/* line 35, ../../resources/sass/text.sass */
 .fs-12 {
   font-size: 0.75em;
 }
 
-/* line 47, ../../resources/sass/text.sass */
+/* line 37, ../../resources/sass/text.sass */
 .fs-16 {
   font-size: 1em;
 }
 
-/* line 49, ../../resources/sass/text.sass */
+/* line 39, ../../resources/sass/text.sass */
 .fs-18 {
   font-size: 1.125em;
 }
 
-/* line 51, ../../resources/sass/text.sass */
+/* line 41, ../../resources/sass/text.sass */
 .fs-20 {
   font-size: 1.25em;
 }
 
-/* line 53, ../../resources/sass/text.sass */
+/* line 43, ../../resources/sass/text.sass */
 .fs-22 {
   font-size: 1.375em;
 }
 
-/* line 55, ../../resources/sass/text.sass */
+/* line 45, ../../resources/sass/text.sass */
 .fs-24 {
   font-size: 1.5em;
 }
 
-/* line 57, ../../resources/sass/text.sass */
+/* line 47, ../../resources/sass/text.sass */
 .fs-26 {
   font-size: 1.625em;
 }
 
-/* line 59, ../../resources/sass/text.sass */
+/* line 49, ../../resources/sass/text.sass */
 .fs-29 {
   font-size: 1.813em;
 }
 
-/* line 61, ../../resources/sass/text.sass */
+/* line 51, ../../resources/sass/text.sass */
 .fs-30 {
   font-size: 1.875em;
 }
 
-/* line 63, ../../resources/sass/text.sass */
+/* line 53, ../../resources/sass/text.sass */
 .fs-31 {
   font-size: 1.938em;
 }
 
-/* line 65, ../../resources/sass/text.sass */
+/* line 55, ../../resources/sass/text.sass */
 .fs-36 {
   font-size: 2.25em;
 }
