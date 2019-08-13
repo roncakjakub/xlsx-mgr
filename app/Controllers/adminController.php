@@ -228,7 +228,6 @@
 					Ak zvýšili staré, odstráň ich
 				**************************************/		
 					$invID=$this->dbCtrl->getID("investori","meno= '".$rows[$i]["nameArr"][$oldI]."' and email= '".$rows[$i]["emailArr"][$oldI]."'");
-					die($invID);
 					$this->dbCtrl->delete("inv_midd","riadok_fk=".$rowID." and investor_fk= ".$invID);
 			}
 
@@ -358,8 +357,11 @@
 						Podmienky
 					******************/	
 
-				if($podm=="home"||$podm=="init"||$podm=="notif1"||$podm=="notif2")
+				if($podm=="home"||$podm=="pre_init"||$podm=="init"||$podm=="notif1"||$podm=="notif2")
 					if((intval($row["archived"])==1)||($dateDiff<=-90)) continue;
+				
+				if($podm=="pre_init")
+					if (($dateDiff<0)) continue;
 				
 				if($podm=="init")
 					if (($dateDiff<=-30)||($dateDiff>0)) continue;
@@ -499,9 +501,9 @@
 		  				$data[$rowIndex]["edit"] = '<button type="button" class="'.(($row["downloaded"]==0&&$row["archived"]==1)?"active":"").' btn btn-view" data-toggle="modal" '.((!empty($row["paymentFiles"]))?('data-target="#investFilesModal" onclick="ajaxInvestFiles('.$key.','.$rowID.','.$data["permitAble"].')" "><i class="fas fa-download"></i>'):('
 		  					data-target="#previewMailModal" onclick="ajaxPreview('.$key.','.$rowID.')"><i class="far fa-eye"></i>')).' </button>';
 		  				}
-		  				$data[$rowIndex]["delete"] = '<form action="/admin/delete" class="m-0" method="POST">
-						<input type="hidden" name="name[]" value="'.$dataVal["fileName"].'">
-						<input type="hidden" name="area[]" value="'.($rowID+1).'">
+		  				$data[$rowIndex]["delete"] = '<form action="/admin/'.(($row["archived"]==1)?"total":"").'delete" class="m-0" method="POST">
+						<input type="hidden" name="name[]" value="'.$row["nazov"].'">
+						<input type="hidden" name="area[]" value="'.$row["rowNO"].'">
 						<button class="fs-16 btn btn-delete action" type="button" onclick="delCheck(this)"><i class="clr-red fas fa-times-circle"></i></button></form>';
 
 						$data[$rowIndex]["modal"] = '<button type="button" class="btn btn-view" data-toggle="modal" data-target="#XLSXModal" onclick="viewXLSXModal('.$key.','.$rowID.')"><i class="fas fa-folder-open"></i></button>';

@@ -15,6 +15,7 @@ require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../app/Controllers/LoginController.php';
 require __DIR__ . '/../app/Controllers/dbController.php';
 require __DIR__ . '/../app/Controllers/uploadController.php';
+require __DIR__ . '/../app/Controllers/ftpController.php';
 require __DIR__ . '/../app/Models/LoginModel.php';
 require __DIR__ . '/../app/Models/otherModel.php';
 require __DIR__ . '/../app/Controllers/adminController.php';
@@ -33,8 +34,13 @@ $config['db']['user']   = 'db82424xlsxmgr';
 $config['db']['pass']   = 'xlsxmgr53!M';
 $config['db']['dbname'] = 'db82424xlsxmgr';
 
-$app = new \Slim\App(['settings' => $config]);
+define(FTP_NAT_IP, "");
+define(FTP_NAT_PORT, "");
+define(FTP_NAT_USER, "");
+define(FTP_NAT_PASS, "");
 
+
+$app = new \Slim\App(['settings' => $config]);
 
 $container = $app->getContainer();
 
@@ -47,7 +53,7 @@ $container['db'] = function ($c) {
     $db = $c['settings']['db'];
     $pdo = new PDO('mysql:host=' . $db['host'] . ';dbname=' . $db['dbname'],
         $db['user'], $db['pass']);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
     return $pdo;
 };
@@ -64,6 +70,9 @@ $container['LoginController'] = function ($container) {
 };
 $container['OtherModel'] = function ($container) {
     return new OtherModel();
+};
+$container['FTPController'] = function ($container) {
+    return new FTPController(FTP_NAT_IP, FTP_NAT_PORT, FTP_NAT_USER, FTP_NAT_PASS);
 };
 $container['UploadController'] = function ($container) {
     return new UploadController($container['OtherModel'], $container['DbController']);

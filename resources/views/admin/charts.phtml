@@ -9,7 +9,7 @@
 		<div class="content font_Arial bg-white container pt-3 h-100">
 		<div class="chartNav ff_cg row">
 				
-			<?php $chartNavArr = array("init"=>"Po 1. upozornení", "notif1"=>"Po 2. upozornení","notif2"=>"Po 3. upozornení" ); 
+			<?php $chartNavArr = array("pre_init"=>"Pred inicializáciou","init"=>"Po inicializácií", "notif1"=>"Po 1. upozornení","notif2"=>"Po 2. upozornení" ); 
 			foreach ($chartNavArr as $link => $text): ?>
 			<div class="col <?php echo ($data["active"]==$link)?"active":"" ?>"><a href="/admin/charts/<?php echo $link ?>" class="<?php echo ($data["active"]==$link)?"clr-org":"text-dark"?>"><?php echo $text ?></a></div>
 		<?php endforeach; ?>

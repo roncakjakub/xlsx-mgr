@@ -25,6 +25,7 @@ class DbController
 		********************************/
 		$where=($where)? "where ".$where : "" ;
 		$orderby=($orderby)? "order by ".$orderby : "" ;
+
 		return $this->pdo->query("SELECT ".$cols." FROM ".$table." ".$join." ".$where." ".$orderby);
 	}
 

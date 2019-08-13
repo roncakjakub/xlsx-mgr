@@ -1,4 +1,9 @@
 <?php
+var_dump($this->FTPController->getDir());
+var_dump($this->FTPController);
+
+die();
+
 $fileArr=glob($this->resources.'/xlsxs/*.xlsx');
 
 $myMail=$this->LoginController->getEmails()[0];

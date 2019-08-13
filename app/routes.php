@@ -248,12 +248,32 @@ $app->post('/admin[/{section}[/{adds}]]', function ($request, $response,$args) u
 		if ($section=="delete") {
 			/*******************
 				4 riadky nadol skontroluj a uprav cesty - area
+			
+				Odstraňovanie bude prebiehať iba vo virtuálnej hladine ( DB ). Pre daný riadok sa nastaví deleted = 1 a bude ho možné zobraziť ???...bohviekde..??? ( asi archív )
+
+			*******************/
+			$fileName=$post["name"][0];
+			$rowIndex=$post["area"][0];
+
+			$rowID=$this->DbController->getID("dataview","nazov = ".$fileName." and rowNO = ".$rowIndex);
+
+		    if($this->DbController->update("riadky",array("archived", "downloaded"),array(1,1),"ID=".$rowID))
+				$this->session->set('alert', 1);
+			else $this->session->set('alert', 0);
+			}
+
+		if ($section=="totaldelete"){
+			/*******************
+			
+				Odstraňovanie bude prebiehať aj fyzicky v súbore a v DB.
+
 			*******************/
 			$fileName=$post["name"][0];
 			$rowArr=$post["area"];
 			$payAdress=$this->resources."/neov_platby/".$xlsxID."/".$rowID;
 			$this->AdminController->delXLSXRow($this->resources,$fileName, $rowArr);
 				$this->session->set('alert', 1);
+
 		}
 		if ($section=="update") {
 			/**************************************************
@@ -277,6 +297,9 @@ $app->post('/admin[/{section}[/{adds}]]', function ($request, $response,$args) u
 					$newRows=$delRows=$updateRows=$newI=$updateIndex=array();
 					$fileName = explode(".",basename($newFileAdr))[0];
 					
+					if (empty(glob($this->resources."/xlsxs/".$fileName.".xlsx")))
+						continue;
+
 					$newFileData=$this->AdminController->XLSXSFirstData($newFileAdr);
 					$oldFileData=$this->AdminController->XLSXSFirstData($this->resources."/xlsxs/".basename($newFileAdr));
 					$oldSQLData=$this->AdminController->loadXLSXs($this->resources, "xlsxs" ,"noAccFiles",$fileName);  
@@ -300,7 +323,7 @@ echo "<br><br>";
 var_dump($oldDateDiff);
 echo "<br><br>";
 echo "<br><br>";
-*/
+die();
 		/*************************************************
 				V prípade, že existuje starý riadok a nový nie (odstráň)
 		*************************************************/
@@ -468,8 +491,7 @@ $app->get('/admin[/{section}[/{adds}]]', function ($request, $response,$args) us
 			$data["preparedData"]=$this->AdminController->prepareData($xlsxData);
 
 			$data["newFilesTyp"] = "xlsxs";
-			$data["newFilesPlatba"] = "neov_platby";
-			$newFilesData=$this->AdminController->loadXLSXs($this->resources,$data["newFilesTyp"], $data["newFilesPlatba"],"newFiles");
+			$newFilesData=$this->AdminController->loadXLSXs($this->resources,$data["newFilesTyp"],"newFiles");
 			$data["newFilesPrepData"]=$this->AdminController->prepareData($newFilesData);
 			$this->view->render($response, 'inc/_top.phtml');
 
@@ -482,6 +504,13 @@ $app->get('/admin[/{section}[/{adds}]]', function ($request, $response,$args) us
 		}
 		if ($section=="charts") {
 			if (isset($args["adds"])) {
+				if ($args["adds"]=="pre_init"){
+					/*************************
+						Pred 1. emailom
+					*************************/
+					$data["typ"] = "xlsxs";
+					$XLSXpodm = $args["adds"];
+				}
 				if ($args["adds"]=="init"){
 					/*************************
 						Pred 1. emailom
